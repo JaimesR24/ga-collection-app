@@ -1,37 +1,46 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
+import { Text } from 'react-native';
+import { Styles } from "@/scripts/Styles";
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
-        }}
-      />
-    </Tabs>
-  );
+export default function TabLayout(){
+    return(
+        <Tabs screenOptions={tabBarOptions}>
+            <Tabs.Screen
+                name = "index"
+                options = {{
+                    title: "Home",
+                    //tabBarIcon: () => <Text style = {styles.temp}>Collections</Text>
+                }}
+            />
+            <Tabs.Screen
+                name = "collections"
+                options = {{
+                    title: "Collections",
+                    //tabBarIcon: () => <Text style = {styles.temp}>Collections</Text>
+                }}
+            />
+            <Tabs.Screen
+                name = "search"
+                options = {{
+                    title: "Search",
+                    //tabBarIcon: () => <Text style = {styles.temp}>Search</Text>
+                }}
+            />
+            <Tabs.Screen
+                name = "settings"
+                options = {{
+                    title: "Settings",
+                    //tabBarIcon: () => <Text style = {styles.temp}>Settings</Text>
+                }}
+            />
+        </Tabs>
+    );
 }
+
+const tabBarOptions = {
+    tabBarStyle: Styles().tabBar,
+    tabBarActiveBackgroundColor: "white",
+    tabBarActiveTintColor: "black",
+    headerStyle: Styles().header,
+    headerTintColor: "white"
+};

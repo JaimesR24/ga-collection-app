@@ -1,0 +1,1 @@
+//use a <Flatlist data = {}/> tag for the whole table

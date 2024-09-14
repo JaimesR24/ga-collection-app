@@ -33,14 +33,28 @@ function isValidGAParam(input: string){
     return validParams.includes(input.toLowerCase());
 }
 
-async function GA_sendRequest(url: string){
-    try {
-        const response = await fetch(url);
-        const json = await response.json();
-        return json.data;
-    }
-    catch(error){
-        console.error(error);
-        return null;
-    }
+/*
+export function GA_cardImageURL(slug: string, prefix: string, isCSR: boolean){
+    return `https://ga-index-public.s3.us-west-2.amazonaws.com/cards/${slug}-${prefix}-${isCSR ? "CSR" : ""}.jpg`;
+}
+*/
+
+export function GA_cardImageURL(editionSlug: string){
+    return `https://ga-index-public.s3.us-west-2.amazonaws.com/cards/${editionSlug}.jpg`;
+}
+
+
+export function GA_elementIconURL(element: string){
+    return `https://index.gatcg.com/images/icons/elements/${element}.png`;
+}
+
+//might have to change the input cause of multiple types, like regalia item specifically
+export function GA_typeIconURL(type: string){
+    //item and item-regalia are two different things
+    //action, ally, champion, item, item-regalia, weapon
+    return `https://index.gatcg.com/images/icons/types/${type}.png`;
+}
+
+export function GA_costIconURL(isMemory: false){
+    return `https://index.gatcg.com/images/icons/${isMemory ? "memory" : "reserve"}_cost.png`;
 }

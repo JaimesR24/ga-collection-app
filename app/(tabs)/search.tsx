@@ -1,13 +1,13 @@
 import { Text, TextInput, View, FlatList, StyleSheet } from "react-native";
 import React, { useState } from 'react';
 import { Styles } from '@/scripts/Styles';
-import { GA_nameSearchURL, GA_advancedSearchURL } from "@/scripts/GAIndexRequests";
+import { GA_nameSearchURL, GA_advancedSearchURL, GA_cardImageURL } from "@/scripts/GAIndexRequests";
 import GACardEntry from '@/components/GACardEntry';
 
 enum SearchMode {Index, Collection};
 
-export default function Tab(results: any){
-    const [searchResults, setSearchResults] = useState(results || null);
+export default function Tab(results: any[]){
+    const [searchResults, setSearchResults] = useState(results || {});
     const [searchParameters, setSearchParameters] = useState('');
     const [searchMode, setSearchMode] = useState(SearchMode.Index);
 
@@ -16,16 +16,26 @@ export default function Tab(results: any){
         if (typeof searchParameters == 'string') URL = GA_nameSearchURL(searchParameters);
         else URL = GA_advancedSearchURL(searchParameters);
 
-        try {
-            console.log(`Attempting to fetch with this url: ${URL}`);
-            const response = await fetch(URL);
-            const json = await response.json();
-            setSearchResults(json.data);
-            console.log(JSON.stringify(json.data));
+        
+        var json;
+        var page_number = 1;
+        var final_data;
+        while (page_number == 1 || json?.has_more){
+            var newURL = URL + `&page=${page_number}`;
+            try {
+                console.log(`Attempting to fetch with this url: ${newURL}`);
+                const response = await fetch(newURL);
+                json = await response.json();
+                final_data = page_number == 1 ? json.data : [...final_data || [], ...json.data];
+                page_number++;
+            }
+            catch(error){
+                console.error(error);
+                break;
+            }
         }
-        catch(error){
-            console.error(error);
-        }
+        setSearchResults(final_data);
+        //console.log(JSON.stringify(final_data));
     }
 
     function getCollectionCardlist(){
@@ -43,7 +53,7 @@ export default function Tab(results: any){
             />
             <FlatList 
                 data = {searchResults}
-                renderItem ={({item}) => GACardEntry(item.name)}
+                renderItem ={({item}) => GACardEntry(item.name, item.element)}
             />
 
         </View>

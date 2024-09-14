@@ -29,6 +29,14 @@ const styles = StyleSheet.create({
         fontSize: 24,
         padding: 10,
     },
+    box:{
+        borderWidth: 1,
+        borderBlockColor: "white",
+        height: 40,
+        width: 300,
+        margin: 5,
+        padding: 10,
+    }
 });
 
 export function Styles(){

@@ -20,3 +20,8 @@ export function mergeArrays(a: any[], b: any[]){
     }
     return temp;
 }
+
+export function capitalizeFirstLetter(input: string){
+    input = input.toLowerCase();
+    return input.charAt(0).toUpperCase() + input.slice(1);
+}

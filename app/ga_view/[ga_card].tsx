@@ -46,10 +46,10 @@ export default function CardView() {
             <ScrollView>
                 <Image
                     source = {{ uri: currentImageSrc }}
-                    style = {{ width: 250, height: 350 }}
+                    style = {styles.cardImage}
                 />
-                <GA_StatBox card = { currentCard }/>
-                <GA_EditionBox card = { currentCard }/>
+                { currentCard ? <GA_StatBox card = { currentCard }/> : null}
+                { currentCard ? <GA_EditionBox card = { currentCard }/> : null}
             </ScrollView>
         </View>
     );

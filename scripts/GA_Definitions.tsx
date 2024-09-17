@@ -1,3 +1,43 @@
+import * as Utils from '@/scripts/Utils';
+
+enum Rarity{
+    C = 1,
+    U = 2,
+    R = 3,
+    SR = 4,
+    UR = 5,
+    PR = 6,
+    CSR = 7,
+    CUR = 8,
+    CPR = 9,
+}
+
+export function getRarity(val: Rarity){
+    //maybe output color?
+    switch(val){
+        case Rarity.C:
+            return "Common";
+        case Rarity.U:
+            return "Uncommon";
+        case Rarity.R:
+            return "Rare";
+        case Rarity.SR:
+            return "Super Rare";
+        case Rarity.UR:
+            return "Ultra Rare";
+        case Rarity.PR:
+            return "Promotional Rare";
+        case Rarity.CSR:
+            return "Collector Super Rare";
+        case Rarity.CUR:
+            return "Collector Ultra Rare";
+        case Rarity.CPR:
+            return "Collector Promo Rare";
+        default:
+            return "-";
+    }
+}
+
 export type APIRequest = {
     page: number,
     total_cards: number,
@@ -57,11 +97,10 @@ export type APIParams = {
     illustrator?: string,
     edition_effect?: string,
     edition_flavor?: string,
-    legality_format?: null,
-    legality_limit?: number,
+    legality?: { legality_format?:{limit?: number}}
 }
 
-type APICardEdition = {
+export type APICardEdition = {
     uuid: string,
     card_id: string,
     collector_number: string,
@@ -112,6 +151,7 @@ export function getSubtypes(subtypes: string[]){
     var types = ""
 
     for (var s of subtypes){
+        s = Utils.capitalizeFirstLetter(s);
         if (isClass(s)){
             if (!firstIteration) classes += `/`;
             else firstIteration = false;
@@ -122,11 +162,26 @@ export function getSubtypes(subtypes: string[]){
     return classes + types;
 }
 
+export function getFullTypes({types, subtypes}: {types: string[], subtypes: string[]}){
+    var output = "";
+    for(var t of types){
+        output += `${Utils.capitalizeFirstLetter(t)} `;
+    }
+    output += `- ${getSubtypes(subtypes)}`;
+    return output;
+}
+
 function isClass(input: string){
     const classes = ['WARRIOR', 'MAGE', 'ASSASSIN', 'TAMER', 'RANGER', 'CLERIC', 'GUARDIAN'];
     return classes.includes(input.toUpperCase());
 }
 
-export function isMaterialCard(card: APICardData){
-    return card.types.includes("CHAMPION") || card.types.includes("REGALIA");
+export function isMaterialCard(types: string[]){
+    console.log(`checking card types: ${JSON.stringify(types)}`);
+    return types.includes("CHAMPION") || types.includes("REGALIA");
+}
+
+export function getCost(card: APICardData){
+    var { type, cost } = isMaterialCard(card.types) ? {type: "Memory", cost: card.cost_memory} : {type: "Reserve", cost: card.cost_reserve};
+    return `${type} Cost: ${cost}`;
 }

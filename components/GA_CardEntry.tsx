@@ -4,7 +4,6 @@ import { Link } from 'expo-router';
 import { getElementColor } from '@/scripts/GA_Definitions';
 
 export default function GA_CardEntry(card: any){
-    //untested
     return (
         <View style = {[styles.box, {backgroundColor: getElementColor(card.element)}]}>
             <Link href = {{

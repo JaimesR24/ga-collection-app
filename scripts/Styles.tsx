@@ -36,7 +36,23 @@ export const styles = StyleSheet.create({
         width: 300,
         margin: 5,
         padding: 10,
-    }
+        alignContent: "center",
+    },
+    flexibleBox:{
+        borderWidth: 1,
+        borderBlockColor: "white",
+        width: 350,
+        margin: 5,
+        padding: 10,
+        alignContent: "center",
+    },
+    cardImage:{
+        width: 250,
+        height: 350,
+        alignItems: "center",
+        //this is exact margin within the parent view, flexibleBox. need to check on different resolutions
+        marginLeft: 50,
+    },
 });
 
 export const headerOptions = {

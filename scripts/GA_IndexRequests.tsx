@@ -1,12 +1,9 @@
 const ga_index_root = "https://api.gatcg.com";
 
-export function GA_nameSearchURL(name: string){
-    return `${ga_index_root}/cards/search?name=${name}`;
-}
+export function GA_nameSearchURL(name: string){ return `${ga_index_root}/cards/search?name=${name}`; }
 
-export function GA_nameSlugURL(name: string){
-    return `${ga_index_root}/cards/${name}`;
-}
+//slug name doesn't seem to work
+export function GA_nameSlugURL(name: string){ return `${ga_index_root}/cards/${name}`; }
 
 export function GA_advancedSearchURL(params: any){
     //base URL for a card search with no assumptions

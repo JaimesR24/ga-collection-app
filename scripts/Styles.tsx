@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
     main: {
       flex: 1,
       justifyContent: "center",
@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export function Styles(){
-    return styles;
+export const headerOptions = {
+    headerStyle: styles.header,
+    headerTitleStyle: styles.text,
 }

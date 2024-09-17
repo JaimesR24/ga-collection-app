@@ -1,6 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
-import { Styles } from "@/scripts/Styles";
+import { styles } from "@/scripts/Styles";
 
 export default function TabLayout(){
     return(
@@ -33,14 +32,15 @@ export default function TabLayout(){
                     //tabBarIcon: () => <Text style = {styles.temp}>Settings</Text>
                 }}
             />
+            
         </Tabs>
     );
 }
 
 const tabBarOptions = {
-    tabBarStyle: Styles().tabBar,
+    tabBarStyle: styles.tabBar,
     tabBarActiveBackgroundColor: "white",
     tabBarActiveTintColor: "black",
-    headerStyle: Styles().header,
+    headerStyle: styles.header,
     headerTintColor: "white"
 };

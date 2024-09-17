@@ -1,11 +1,11 @@
 import { Text, View, Pressable, Button} from "react-native";
 import React, { useState } from 'react';
-import { Styles } from '@/scripts/Styles';
+import { styles } from '@/scripts/Styles';
 
 export default function Index() {
   return (
-    <View style={Styles().main}>
-      <Text style={[Styles().title, Styles().text]}>Welcome to Grand Archive Collection.</Text>
+    <View style={styles.main}>
+      <Text style={[styles.title, styles.text]}>Welcome to Grand Archive Collection.</Text>
     </View>
   );
 }

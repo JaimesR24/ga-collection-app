@@ -1,13 +1,14 @@
 import { Text, TextInput, View, FlatList, StyleSheet } from "react-native";
 import React, { useState } from 'react';
-import { Styles } from '@/scripts/Styles';
-import { GA_nameSearchURL, GA_advancedSearchURL, GA_cardImageURL } from "@/scripts/GAIndexRequests";
-import GACardEntry from '@/components/GACardEntry';
+import { styles } from '@/scripts/Styles';
+import { GA_nameSearchURL, GA_advancedSearchURL, GA_cardImageURL } from "@/scripts/GA_IndexRequests";
+import GA_CardEntry from '@/components/GA_CardEntry';
+import { APICardData } from "@/scripts/GA_Definitions";
 
 enum SearchMode {Index, Collection};
 
-export default function Tab(results: any[]){
-    const [searchResults, setSearchResults] = useState(results || {});
+export default function Tab(results: APICardData[]){
+    const [searchResults, setSearchResults] = useState(results);
     const [searchParameters, setSearchParameters] = useState('');
     const [searchMode, setSearchMode] = useState(SearchMode.Index);
 
@@ -16,14 +17,13 @@ export default function Tab(results: any[]){
         if (typeof searchParameters == 'string') URL = GA_nameSearchURL(searchParameters);
         else URL = GA_advancedSearchURL(searchParameters);
 
-        
         var json;
         var page_number = 1;
         var final_data;
         while (page_number == 1 || json?.has_more){
             var newURL = URL + `&page=${page_number}`;
             try {
-                console.log(`Attempting to fetch with this url: ${newURL}`);
+                console.log(`Search attempting to fetch with this url: ${newURL}`);
                 const response = await fetch(newURL);
                 json = await response.json();
                 final_data = page_number == 1 ? json.data : [...final_data || [], ...json.data];
@@ -43,9 +43,9 @@ export default function Tab(results: any[]){
     }
 
     return (
-        <View style = {Styles().main}>
+        <View style = {styles.main}>
             <TextInput 
-                style={Styles().textInput} 
+                style={styles.textInput} 
                 onChangeText={setSearchParameters} 
                 value = {searchParameters} 
                 defaultValue = "Search..." 
@@ -53,11 +53,9 @@ export default function Tab(results: any[]){
             />
             <FlatList 
                 data = {searchResults}
-                renderItem ={({item}) => GACardEntry(item.name, item.element)}
+                renderItem ={({item}) => GA_CardEntry(item)}
             />
 
         </View>
     );
 }
-
-//<Text style = {[Styles().text, Styles().title]}>Search</Text>

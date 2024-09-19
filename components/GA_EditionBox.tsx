@@ -1,27 +1,35 @@
 import { View, Text, Button, Pressable, FlatList } from 'react-native';
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { styles } from '@/scripts/Styles';
-import { APICardData } from '@/scripts/GA_Definitions';
+import { APICardData, APICardEdition } from '@/scripts/GA_Definitions';
 import GA_EditionEntry from '@/components/GA_EditionEntry';
+import { Dictionary } from '@/scripts/Utils';
 
 export default function GA_EditionBox({card}: {card: APICardData}){
-    const [editionCounts, setEditionCounts] = useState([]);
+    const [editionEntries, setEditionEntries] = useState(new Array<React.JSX.Element>());
 
-    function handleAddClick (prefix: string){
-        console.log("Add");
-    }
-    function handleSubClick (prefix: string){
-        console.log("Sub");
-    }
+    //const [editionEntries2, setEditionEntries2] = useState(new Array<{quantity: number, element: React.JSX.Element}>());
+
+    useEffect(() => {
+        var temp = new Array<React.JSX.Element>();
+        if (card.editions){
+            for(var ed of card.editions){
+                temp.push(<GA_EditionEntry edition = {ed} />);
+            }
+        }
+        setEditionEntries(temp);
+        
+    }, [card.editions]);
+
+    //now i need a button that can extract the state of all the editionEntry components to put them into a query update.
 
     return (
         <View style = { styles.flexibleBox }>
             <FlatList 
-                data = {card.editions}
-                renderItem ={({item}) => GA_EditionEntry(item, handleAddClick, handleSubClick)}
+                data = {editionEntries}
+                renderItem ={({item}) => item}
                 scrollEnabled = { false }
             />
         </View>
     )
 }
-

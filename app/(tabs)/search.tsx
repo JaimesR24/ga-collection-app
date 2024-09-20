@@ -30,7 +30,7 @@ export default function Tab(results: APICardData[]){
                 page_number++;
             }
             catch(error){
-                console.error(error);
+                console.error(`Invalid JSON Output: ${error}`);
                 break;
             }
         }

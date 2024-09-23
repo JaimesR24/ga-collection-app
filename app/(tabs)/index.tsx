@@ -11,7 +11,8 @@ export default function Index() {
       try {
         await CardDatabase.clearDatabase();
         await CardDatabase.setupDatabase();
-        await CardDatabase.addCollection("Dummy Collection");
+        await CardDatabase.addCollection("Dummy Collection 1");
+        await CardDatabase.addCollection("Dummy Collection 2");
         setInitState(true);
       }
       catch(error) {

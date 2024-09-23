@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { APICardData, APICardEdition } from '@/scripts/GA_Definitions';
 
 const db = SQLite.openDatabaseAsync('ga-collection.db');
 
@@ -35,7 +36,7 @@ export async function clearDatabase(){
     const query = `DROP TABLE IF EXISTS collections;
                    DROP TABLE IF EXISTS ga_cards;`
     await (await db).execAsync(query);
-    console.log("Database cleared");
+    console.log("Database cleared.");
     return Promise<void>;
 }
 
@@ -79,36 +80,35 @@ export async function getUniqueCards(c_id: number | null = null){
 export async function getEditionCards(slug: string, c_id: number | null = null){
     var query;
     //if no collection is passed, get every card separated by edition
-    if (c_id) query = `SELECT set_prefix, rarity, quantity FROM ga_cards WHERE collection_id == ${c_id} AND card_slug == ${slug} ORDER BY edition_slug;`;
-    else query = `SELECT set_prefix, rarity, SUM(quantity) as quantity FROM ga_cards WHERE card_slug == ${slug} GROUP BY edition_slug ORDER BY edition_slug;`
+    if (c_id) query = `SELECT set_prefix, rarity, quantity FROM ga_cards WHERE collection_id == ${c_id} AND card_slug == "${slug}" ORDER BY set_prefix;`;
+    else query = `SELECT set_prefix, rarity, SUM(quantity) as quantity FROM ga_cards WHERE card_slug == "${slug}" GROUP BY set_prefix ORDER BY set_prefix;`
 
+    //console.log(`Attempting query: ${query}`);
     const result = await (await db).getAllAsync(query);
-    console.log(`Result for c_id ${c_id}: ${JSON.stringify(result)}`);
+    console.log(`Result for c_id ${c_id} and slug ${slug}: ${JSON.stringify(result)}`);
     return result;
 }
 
-export async function modifyCards(c_id: number, editionSlug: string, rarity: number, newQuantity: number){
+export async function modifyCards(c_id: number, card: APICardData, edition: APICardEdition, newQuantity: number){
     var query;
     if (newQuantity > 0){
         query = `
-            UPDATE ga_cards
-            SET quantity = ${newQuantity}
-            WHERE collection_id == ${c_id} AND
-                  edition_slug == ${editionSlug} AND
-                  rarity == ${rarity};
+            INSERT INTO ga_cards VALUES (${c_id}, "${card.slug}", "${card.name}", "${card.element}", "${edition.slug}", "${edition.set.prefix}", ${edition.rarity}, ${newQuantity})
+            ON CONFLICT (collection_id, edition_slug, rarity)
+            DO UPDATE SET quantity = EXCLUDED.quantity;
         `;
     }
     else{
         query = `
             DELETE FROM ga_cards
             WHERE collection_id == ${c_id} AND
-                  edition_slug == ${editionSlug} AND
-                  rarity == ${rarity};
+                  edition_slug == "${edition.slug}" AND
+                  rarity == ${edition.rarity};
         `;
     }
 
     await (await db).runAsync(query);
-    console.log(`Modified ${editionSlug} in c_id ${c_id} to: ${newQuantity}`);
+    console.log(`Modified ${edition.slug} in collection_id ${c_id} to: ${newQuantity}`);
     return Promise<void>;
 }
 

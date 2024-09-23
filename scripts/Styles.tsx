@@ -21,9 +21,10 @@ export const styles = StyleSheet.create({
     },
     textInput:{
         borderWidth: 1,
-        borderBlockColor: "white",
+        borderColor: "white",
         backgroundColor: "grey",
         height: 45,
+        width: 250,
         margin: 14,
         color: "white",
         fontSize: 24,
@@ -52,6 +53,16 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         //this is exact margin within the parent view, flexibleBox. need to check on different resolutions
         marginLeft: 50,
+    },
+    dropdown:{
+        margin: 16,
+        height: 50,
+        borderBottomColor: "white",
+        borderBottomWidth: 0.5,
+    },
+    button:{
+        width: 20,
+        borderColor: "white",
     },
 });
 

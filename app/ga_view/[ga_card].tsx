@@ -30,15 +30,11 @@ export default function CardView() {
     const [currentImageSrc, setImageSrc] = useState('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fblog.silvie.org%2Fassets%2Fimages%2F2022-07-07-convention-demo-deck-samples%2Fcard-back.png&f=1&nofb=1&ipt=81a89be5190c354a5f6335453279657c152a51420504fa75cc03c3c6f36de526&ipo=images');
     const navigation = useNavigation();
     
-    //useLayoutEffect if its too slow/delayed
-
-    //useEffect(() => { prepareCardView(GA_nameSlugURL(local.ga_card as string)) }, []);
     useLayoutEffect(() => { 
         navigation.setOptions({title: local.ga_card as string});
         prepareCardView(GA_nameSearchURL(local.ga_card as string));
     }, [navigation, local.ga_card]);
-
-    //just in case the card does not load, have important info like types, element, cost, stats, speed, effect, etc...
+    
     //then below that, have the available editions. buttons to increase, decrease for selected collection. if collection null, leave them at - with no effect.
     //clicking on the edition will change the image to that editions image.
     return (
@@ -49,7 +45,7 @@ export default function CardView() {
                     style = {styles.cardImage}
                 />
                 { currentCard ? <GA_StatBox card = { currentCard }/> : null}
-                { currentCard ? <GA_EditionBox card = { currentCard }/> : null}
+                { currentCard ? <GA_EditionBox card = { currentCard } collection = { null }/> : null}
             </ScrollView>
         </View>
     );

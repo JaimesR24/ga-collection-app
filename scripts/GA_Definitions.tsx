@@ -177,11 +177,15 @@ function isClass(input: string){
 }
 
 export function isMaterialCard(types: string[]){
-    console.log(`checking card types: ${JSON.stringify(types)}`);
+    //console.log(`checking card types: ${JSON.stringify(types)}`);
     return types.includes("CHAMPION") || types.includes("REGALIA");
 }
 
 export function getCost(card: APICardData){
     var { type, cost } = isMaterialCard(card.types) ? {type: "Memory", cost: card.cost_memory} : {type: "Reserve", cost: card.cost_reserve};
     return `${type} Cost: ${cost}`;
+}
+
+export function isKickstarter(slug: string){
+    return /.-ks$/.test(slug);
 }

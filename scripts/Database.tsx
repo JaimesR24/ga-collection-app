@@ -54,34 +54,37 @@ export async function deleteCollection(c_id: number){
 
 export async function getCollections(){
     const result = await (await db).getAllAsync(`SELECT * FROM collections;`);
-    console.log(`Result: ${JSON.stringify(result)}`);
+    console.log(`Returning collections...`);
     return result;
 }
 
-export async function getCollectionTotal(c_id: number){
-    const result = await (await db).getAllAsync(`SELECT SUM(quantity) as total_cards FROM ga_cards WHERE collection_id == ${c_id};`);
-    console.log(`Result for c_id ${c_id}: ${JSON.stringify(result)}`);
+export async function getCollectionTotals(){
+    const result = await (await db).getAllAsync(`SELECT c_id, name, IFNULL(SUM(quantity), 0) as total_cards FROM collections LEFT JOIN ga_cards ON c_id == collection_id GROUP BY c_id;`);
+    console.log(`Returning collection totals...`);
     return result;
 }
 
 //this one gets a single copy of unique cards by name, regardless of edition prints
 //c_id corresponds to the c_id key of the collection table
-export async function getUniqueCards(c_id: number | null = null){
+export async function getUniqueCards(c_id: number | null = null, strParam: string = ""){
     //if c_id == null/NaN, get all cards present in DB, regardless of collection
-    const result = await (await db).getAllAsync(`SELECT card_name, SUM(quantity) AS card_quantity 
-                                                    FROM ga_cards
-                                                    ${c_id ? `WHERE collection_id == ${c_id}` : ""}
-                                                    GROUP BY card_slug
-                                                    ORDER BY card_slug, element;`);
-    console.log(`Result for c_id ${c_id}: ${JSON.stringify(result)}`);
+    const whereCondition = c_id || strParam != "" ? `WHERE ${c_id ? `collection_id == ${c_id}` : ""} 
+                                                    ${c_id && strParam != "" ? " AND " : ""}
+                                                    ${strParam != "" ? `card_name LIKE '%${strParam}%'` : ""}` : "";
+    const result = await (await db).getAllAsync(`SELECT card_name AS name, element, SUM(quantity) AS quantity 
+                                                FROM ga_cards
+                                                ${whereCondition}
+                                                GROUP BY card_slug
+                                                ORDER BY card_slug, element;`);
+    //console.log(`Result for c_id ${c_id} looking for ${strParam}: ${JSON.stringify(result)}`);
     return result;
 }
 
 export async function getEditionCards(slug: string, c_id: number | null = null){
     var query;
     //if no collection is passed, get every card separated by edition
-    if (c_id) query = `SELECT set_prefix, rarity, quantity FROM ga_cards WHERE collection_id == ${c_id} AND card_slug == "${slug}" ORDER BY set_prefix;`;
-    else query = `SELECT set_prefix, rarity, SUM(quantity) as quantity FROM ga_cards WHERE card_slug == "${slug}" GROUP BY set_prefix ORDER BY set_prefix;`
+    if (c_id) query = `SELECT set_prefix, card_slug AS slug, rarity, quantity FROM ga_cards WHERE collection_id == ${c_id} AND card_slug == "${slug}" ORDER BY set_prefix;`;
+    else query = `SELECT set_prefix, card_slug AS slug, rarity, SUM(quantity) as quantity FROM ga_cards WHERE card_slug == "${slug}" GROUP BY set_prefix ORDER BY set_prefix;`
 
     //console.log(`Attempting query: ${query}`);
     const result = await (await db).getAllAsync(query);

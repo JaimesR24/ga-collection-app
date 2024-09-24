@@ -9,10 +9,12 @@ export default function Index() {
 
     async function setup(){
       try {
-        await CardDatabase.clearDatabase();
-        await CardDatabase.setupDatabase();
-        await CardDatabase.addCollection("Dummy Collection 1");
-        await CardDatabase.addCollection("Dummy Collection 2");
+        //await CardDatabase.clearDatabase();
+        await CardDatabase.setupDatabase(); //the only database call that is required
+        //await CardDatabase.addCollection("Dummy Collection 1");
+        //await CardDatabase.addCollection("Dummy Collection 2");
+
+        //eventually add dummy card data
         setInitState(true);
       }
       catch(error) {

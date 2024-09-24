@@ -1,16 +1,38 @@
 import { Text, TextInput, View, FlatList, StyleSheet } from "react-native";
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { styles } from '@/scripts/Styles';
 import { GA_nameSearchURL, GA_advancedSearchURL, GA_cardImageURL } from "@/scripts/GA_IndexRequests";
 import GA_CardEntry from '@/components/GA_CardEntry';
 import { APICardData } from "@/scripts/GA_Definitions";
+import * as CardDatabase from '@/scripts/Database';
+import { useLocalSearchParams } from "expo-router";
 
-enum SearchMode {Index, Collection};
+export enum SearchMode {Index, Collection};
 
-export default function Tab(results: APICardData[]){
-    const [searchResults, setSearchResults] = useState(results);
+export default function Tab(){
+    const local = useLocalSearchParams();
+    const [searchResults, setSearchResults] = useState([] as any[]);
     const [searchParameters, setSearchParameters] = useState('');
     const [searchMode, setSearchMode] = useState(SearchMode.Index);
+    const [currentCollection, setCollection] = useState(null as number | null);
+    const [hasInitialized, setInitState] = useState(false);
+
+    useLayoutEffect(() => {
+        console.log("Layout effect...");
+        if (!hasInitialized && local){
+            console.log(`Id... ${JSON.stringify(local.c_id)}`);
+            console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
+            setCollection(Number(local.c_id as string)|| null);
+            setSearchMode(Number(local.mode as string) as SearchMode || SearchMode.Index);
+            setInitState(true);
+        }
+
+        if (searchMode == SearchMode.Collection){
+            getCollectionCardlist();
+        }
+        else setSearchResults([]);
+
+    }, [searchMode, currentCollection]);
 
     async function getAPICardlist(){
         var URL = '';
@@ -38,8 +60,13 @@ export default function Tab(results: APICardData[]){
         //console.log(JSON.stringify(final_data));
     }
 
-    function getCollectionCardlist(){
+    async function getCollectionCardlist(){
         //access the database
+        try{
+            const result = await CardDatabase.getUniqueCards(currentCollection, searchParameters);
+            setSearchResults(result);
+        }
+        catch(error) { console.error(error); }
     }
 
     return (

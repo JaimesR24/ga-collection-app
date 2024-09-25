@@ -4,13 +4,13 @@ import { styles } from '@/scripts/Styles';
 import { APICardData, APICardEdition, isKickstarter } from '@/scripts/GA_Definitions';
 import GA_EditionEntry from '@/components/GA_EditionEntry';
 import * as CardDatabase from '@/scripts/Database';
-import { Dropdown } from 'react-native-element-dropdown';
+import CollectionDropdown from './CollectionDropdown';
 
-export default function GA_EditionBox({card, collection}: {card: APICardData, collection: number | null}){
+export default function GA_EditionBox({card, collection, imageHandler}: {card: APICardData, collection: number | null, imageHandler: Function}){
     const [editionQuantities, setEditionQuantities] = useState(new Array<{edition: APICardEdition, quantity: number}>());
     const [cachedEQ, setCachedEQ] = useState(new Array<{edition: APICardEdition, quantity: number}>());
     const [currentCollection, setCollection] = useState(null as number | null);
-    const [collectionData, setCollectionData] = useState([] as any[]);
+    const [updateDisabled, setUpdateDisabled] = useState(true);
     const [hasInitialized, setInitState] = useState(false);
 
     async function prepareBox(){
@@ -39,60 +39,80 @@ export default function GA_EditionBox({card, collection}: {card: APICardData, co
                     temp.push({edition: ed, quantity: currentQuantity > 0 ? currentQuantity : 0});
                 }
             }
-            setEditionQuantities(temp);
-            setCachedEQ(temp);
+            setCachedEQ(JSON.parse(JSON.stringify(temp)));
+            setEditionQuantities(JSON.parse(JSON.stringify(temp)));
         }
         catch(error) { console.log(error); }
     }
 
-    async function setCollectionList(){
-        var temp = [{c_id: null as number | null, name: "Total"}];
-        try{
-            const result = await CardDatabase.getCollections() as any[];
-            setCollectionData(temp.concat(result));
-        }
-        catch (error) { console.log(error); }
-    }
-
-    //only call this on the initial render.
     useEffect(() => {
         if (!hasInitialized){
-            setCollection(collection as number | null);
-            setCollectionList();
+            console.log(`Initializing collection... ${collection}`);
+            setCollection(Number.isNaN(collection) ? null : collection);
             setInitState(true);
         }
-        prepareBox();
+        else{
+            //only prepareBox after the initial call, otherwise it would call prepareBox() twice on startup
+            prepareBox();
+        }
     }, [card.slug, card.editions, currentCollection]);
+
+    useEffect(() => {
+        //only call this when edition quantities is updated via handlePress(), and not via prepareBox()
+        setUpdateDisabled(!hasChangedValues());
+    }, [editionQuantities]);
 
     function handlePress(prefix:string, adding: boolean, fromKickstarter: boolean){
         //console.log(adding ? "add" : "sub");
-        var tempObj = Array.from(editionQuantities);
+        var tempObj = JSON.parse(JSON.stringify(editionQuantities)) as Array<{edition: APICardEdition, quantity: number}>;
 
         var entryIndex = tempObj.findIndex((element) => element.edition.set.prefix == prefix && isKickstarter(element.edition.slug) == fromKickstarter);
         //console.log(`Checking to see if the prefix ${prefix} exists within editionQuantities, received index = ${entryIndex}`);
         if (entryIndex != -1){
             var entry = tempObj[entryIndex];
             //not allowed to go below 0
+            console.log(`Entry quantity old: ${entry.quantity}`);
             entry.quantity = Math.max(0, entry.quantity + (adding ? 1 : -1));
             tempObj[entryIndex] = entry;
-            setEditionQuantities(tempObj);
-            /*
-            console.log(`Current State:\n`);
-            for (var e of tempObj){
-                console.log(`Entry: ${e.edition.set.name} - ${e.quantity}`);
+            
+            console.log(`Before State:\n`);
+            for (var e of editionQuantities){
+                console.log(`EQ Entry: ${e.edition.set.name} - ${e.quantity}`);
             }
-            */
+            for (var e of cachedEQ){
+                console.log(`CQ Entry: ${e.edition.set.name} - ${e.quantity}`);
+            }
+            for (var e of tempObj){
+                console.log(`Temp Entry: ${e.edition.set.name} - ${e.quantity}`);
+            }
+            console.log(`Entry quantity new: ${entry.quantity}`);
+
+            setEditionQuantities(tempObj);
+            console.log(`After State:\n`);
+            for (var e of editionQuantities){
+                console.log(`EQ Entry: ${e.edition.set.name} - ${e.quantity}`);
+            }
+            for (var e of cachedEQ){
+                console.log(`CQ Entry: ${e.edition.set.name} - ${e.quantity}`);
+            }
+        
         }
         else console.error(`Entry was null.`);
-        
+    }
+
+    function handleDropdownChange(new_id: number | null){
+        setCollection(new_id);
     }
 
     //intended to be called to show an alert when switching collections informing the user that their previous changes will not be saved if they switch
     //"Are you sure you want to switch to _? Your previous changes will be lost."
     function hasChangedValues(){
         //return if the values from the database query are the same as the current values in the state
-        if (editionQuantities.length != cachedEQ.length) console.error(`Cached quantites != modified quantities.`);
-
+        if (!editionQuantities || !cachedEQ) return false;
+        if (editionQuantities.length != cachedEQ.length) {
+            console.error(`Cached quantites != modified quantities.`);
+            return false;
+        }
         //sort the arrays using their prefix. the elements should already be in order, but this ensures it
         var cachedArr = Array.from(cachedEQ.sort((a,b) => {
             if (a > b) return 1;
@@ -106,9 +126,10 @@ export default function GA_EditionBox({card, collection}: {card: APICardData, co
         }));
 
         //compare the entries
-        for (let index = 0; cachedArr.length; index++){
+        for (let index = 0; index < cachedArr.length; index++){
+            console.log(`Checking if element ${cachedArr[index].edition.set.name} has changed values... Cached = ${cachedArr[index].quantity}, Mod = ${moddedArr[index].quantity}`);
             if (cachedArr[index].edition.set.prefix == moddedArr[index].edition.set.prefix && 
-                cachedArr[index].quantity == moddedArr[index].quantity) return true;
+                cachedArr[index].quantity != moddedArr[index].quantity) return true;
         }
         return false;
     }
@@ -117,32 +138,20 @@ export default function GA_EditionBox({card, collection}: {card: APICardData, co
         if (!currentCollection) { console.error(`Error: No collection set when trying to modify cards!`); return; }
         for(var entry of editionQuantities){
             try{ await CardDatabase.modifyCards(currentCollection as number, card, entry.edition, entry.quantity); }
-            catch(error) { console.error(error); }
+            catch(error) { console.error(error); return; }
         }
+        setCachedEQ(JSON.parse(JSON.stringify(editionQuantities)));
     }
 
-    //now i need a button that can extract the state of all the editionEntry components to put them into a query update.
-
-    //renderItem = { item => <Text style = { styles.text }>{item.name}</Text> }
     return (
         <View style = { styles.flexibleBox }>
             <ScrollView horizontal = { true } scrollEnabled = { false }>
-                <Dropdown
-                    style = { styles.dropdown }
-                    data = { collectionData }
-                    maxHeight = {300}
-                    search
-                    labelField = "name"
-                    valueField = "c_id"
-                    placeholder = "Select collection"
-                    searchPlaceholder = "Search..."
-                    value = { currentCollection }
-                    onChange = { item => setCollection(item.c_id) }
-                />
+                <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange } />
                 <Button
                     color = "blue"
                     title= "Update Collection"
                     onPress={() => updateQuantities()}
+                    disabled = { updateDisabled }
                 />
             </ScrollView>
             <FlatList 

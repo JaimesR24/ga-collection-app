@@ -57,6 +57,7 @@ export const styles = StyleSheet.create({
     dropdown:{
         margin: 16,
         height: 50,
+        width: 150,
         borderBottomColor: "white",
         borderBottomWidth: 0.5,
     },

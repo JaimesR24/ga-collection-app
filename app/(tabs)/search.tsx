@@ -6,6 +6,8 @@ import GA_CardEntry from '@/components/GA_CardEntry';
 import { APICardData } from "@/scripts/GA_Definitions";
 import * as CardDatabase from '@/scripts/Database';
 import { useLocalSearchParams } from "expo-router";
+import { Dropdown } from 'react-native-element-dropdown';
+import CollectionDropdown from "@/components/CollectionDropdown";
 
 export enum SearchMode {Index, Collection};
 
@@ -22,7 +24,7 @@ export default function Tab(){
         if (!hasInitialized && local){
             console.log(`Id... ${JSON.stringify(local.c_id)}`);
             console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
-            setCollection(Number(local.c_id as string)|| null);
+            setCollection(Number(local.c_id as string) || null);
             setSearchMode(Number(local.mode as string) as SearchMode || SearchMode.Index);
             setInitState(true);
         }
@@ -68,9 +70,18 @@ export default function Tab(){
         }
         catch(error) { console.error(error); }
     }
+    
+    function handleDropdownChange(new_id: number | null){
+        setCollection(new_id);
+    }
+
+    function toggleSearchMode(){
+
+    }
 
     return (
         <View style = {styles.main}>
+            <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange }/>
             <TextInput 
                 style={styles.textInput} 
                 onChangeText={setSearchParameters} 
@@ -80,7 +91,8 @@ export default function Tab(){
             />
             <FlatList 
                 data = {searchResults}
-                renderItem ={({item}) => GA_CardEntry(item)}
+                extraData = {currentCollection}
+                renderItem ={({item}) => GA_CardEntry(item, currentCollection)}
             />
 
         </View>

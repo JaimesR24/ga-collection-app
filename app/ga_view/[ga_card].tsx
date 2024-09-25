@@ -27,13 +27,19 @@ export default function CardView() {
 
     const local = useLocalSearchParams();
     const [currentCard, setCard] = useState({} as APICardData);
-    const [currentImageSrc, setImageSrc] = useState('https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fblog.silvie.org%2Fassets%2Fimages%2F2022-07-07-convention-demo-deck-samples%2Fcard-back.png&f=1&nofb=1&ipt=81a89be5190c354a5f6335453279657c152a51420504fa75cc03c3c6f36de526&ipo=images');
+    const [currentImageSrc, setImageSrc] = useState('https://www.princedist.com/cdn/shop/products/GA_1024x1024.jpg?v=1672783485');
     const navigation = useNavigation();
     
-    useLayoutEffect(() => { 
-        navigation.setOptions({title: local.ga_card as string});
-        prepareCardView(GA_nameSearchURL(local.ga_card as string));
+    useLayoutEffect(() => {
+        if (local.ga_card){
+            navigation.setOptions({title: local.ga_card as string});
+            prepareCardView(GA_nameSearchURL(local.ga_card as string));
+        }
     }, [navigation, local.ga_card]);
+
+    function handleChangeImage(editionSlug: string){
+        setImageSrc(GA_cardImageURL(editionSlug));
+    }
     
     //then below that, have the available editions. buttons to increase, decrease for selected collection. if collection null, leave them at - with no effect.
     //clicking on the edition will change the image to that editions image.
@@ -44,8 +50,8 @@ export default function CardView() {
                     source = {{ uri: currentImageSrc }}
                     style = {styles.cardImage}
                 />
+                { currentCard ? <GA_EditionBox card = { currentCard } collection = { Number(local.initCollection as string) } imageHandler= { handleChangeImage }/> : null}
                 { currentCard ? <GA_StatBox card = { currentCard }/> : null}
-                { currentCard ? <GA_EditionBox card = { currentCard } collection = { null }/> : null}
             </ScrollView>
         </View>
     );

@@ -52,10 +52,10 @@ export async function deleteCollection(c_id: number){
     return Promise<void>;
 }
 
-export async function getCollections(){
+export async function getCollections(includeTotal: boolean = false){
     const result = await (await db).getAllAsync(`SELECT * FROM collections;`);
     console.log(`Returning collections...`);
-    return result;
+    return includeTotal ? [{c_id: null, name: "Total"}, ...result] : result;
 }
 
 export async function getCollectionTotals(){
@@ -88,7 +88,7 @@ export async function getEditionCards(slug: string, c_id: number | null = null){
 
     //console.log(`Attempting query: ${query}`);
     const result = await (await db).getAllAsync(query);
-    console.log(`Result for c_id ${c_id} and slug ${slug}: ${JSON.stringify(result)}`);
+    //console.log(`Result for c_id ${c_id} and slug ${slug}: ${JSON.stringify(result)}`);
     return result;
 }
 

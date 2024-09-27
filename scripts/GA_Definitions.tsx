@@ -1,6 +1,6 @@
 import * as Utils from '@/scripts/Utils';
 
-enum Rarity{
+export enum Rarity{
     C = 1,
     U = 2,
     R = 3,

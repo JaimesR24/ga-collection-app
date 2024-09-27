@@ -5,15 +5,15 @@ import { getElementColor } from '@/scripts/GA_Definitions';
 
 export default function GA_CardEntry(card: any, c_id: number | null){
     return (
-        <View style = {[styles.box, {backgroundColor: getElementColor(card.element)}]}>
-            <Link href = {{
+        <Link href = {{
                     pathname: `../ga_view/[ga_card]`,
                     params: {ga_card: card.name, initCollection: c_id}
                     }} asChild>
-                <Pressable>
+            <Pressable>
+                <View style = {[styles.box, {backgroundColor: getElementColor(card.element)}]}>
                     <Text style = {styles.text}>{card.name}</Text>
-                </Pressable>
-            </Link>
-        </View>
+                </View>
+            </Pressable>
+        </Link>
     )
 }

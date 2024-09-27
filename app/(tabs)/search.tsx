@@ -1,12 +1,10 @@
-import { Text, TextInput, View, FlatList, StyleSheet } from "react-native";
+import { Text, TextInput, View, FlatList, StyleSheet, Button, ScrollView } from "react-native";
 import React, { useLayoutEffect, useState } from 'react';
 import { styles } from '@/scripts/Styles';
 import { GA_nameSearchURL, GA_advancedSearchURL, GA_cardImageURL } from "@/scripts/GA_IndexRequests";
 import GA_CardEntry from '@/components/GA_CardEntry';
-import { APICardData } from "@/scripts/GA_Definitions";
 import * as CardDatabase from '@/scripts/Database';
 import { useLocalSearchParams } from "expo-router";
-import { Dropdown } from 'react-native-element-dropdown';
 import CollectionDropdown from "@/components/CollectionDropdown";
 
 export enum SearchMode {Index, Collection};
@@ -20,7 +18,6 @@ export default function Tab(){
     const [hasInitialized, setInitState] = useState(false);
 
     useLayoutEffect(() => {
-        console.log("Layout effect...");
         if (!hasInitialized && local){
             console.log(`Id... ${JSON.stringify(local.c_id)}`);
             console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
@@ -76,12 +73,28 @@ export default function Tab(){
     }
 
     function toggleSearchMode(){
-
+        setSearchMode(searchMode == SearchMode.Collection ? SearchMode.Index : SearchMode.Collection);
     }
 
     return (
         <View style = {styles.main}>
-            <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange }/>
+            <ScrollView horizontal = { true } scrollEnabled = { false }>
+                <Text style = { styles.text }>Searching through...</Text>
+                <Button
+                    color = "white"
+                    title= "Collection"
+                    onPress={() => toggleSearchMode()}
+                    disabled = { searchMode == SearchMode.Collection }
+                />
+                <Button
+                    color = "white"
+                    title= "Index"
+                    onPress={() => toggleSearchMode()}
+                    disabled = { searchMode == SearchMode.Index }
+                />
+
+            </ScrollView>
+            {searchMode == SearchMode.Collection ? <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange }/> : null }
             <TextInput 
                 style={styles.textInput} 
                 onChangeText={setSearchParameters} 
@@ -92,9 +105,12 @@ export default function Tab(){
             <FlatList 
                 data = {searchResults}
                 extraData = {currentCollection}
-                renderItem ={({item}) => GA_CardEntry(item, currentCollection)}
+                renderItem ={({item}) => GA_CardEntry(item, searchMode == SearchMode.Collection ? currentCollection : null)}
             />
 
         </View>
     );
 }
+//consider nulling the flatlist to a simple "No results." when searchResults is empty
+//replace Buttons with pressables since you can't really customize or style the button itself very easily.
+//perhaps make a custom button component that is really a pressable with a default styling

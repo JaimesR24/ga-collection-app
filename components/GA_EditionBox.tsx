@@ -1,10 +1,11 @@
 import { View, Text, Button, Pressable, FlatList, ScrollView } from 'react-native';
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { styles } from '@/scripts/Styles';
-import { APICardData, APICardEdition, isKickstarter } from '@/scripts/GA_Definitions';
+import { APICardData, APICardEdition, isKickstarter, Rarity } from '@/scripts/GA_Definitions';
 import GA_EditionEntry from '@/components/GA_EditionEntry';
 import * as CardDatabase from '@/scripts/Database';
 import CollectionDropdown from './CollectionDropdown';
+import CustomButton from './CustomButton';
 
 export default function GA_EditionBox({card, collection, imageHandler}: {card: APICardData, collection: number | null, imageHandler: Function}){
     const [editionQuantities, setEditionQuantities] = useState(new Array<{edition: APICardEdition, quantity: number}>());
@@ -62,39 +63,20 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
         setUpdateDisabled(!hasChangedValues());
     }, [editionQuantities]);
 
-    function handlePress(prefix:string, adding: boolean, fromKickstarter: boolean){
+    function handlePress(prefix:string, editionSlug: string, rarity: Rarity, adding: boolean){
         //console.log(adding ? "add" : "sub");
         var tempObj = JSON.parse(JSON.stringify(editionQuantities)) as Array<{edition: APICardEdition, quantity: number}>;
 
-        var entryIndex = tempObj.findIndex((element) => element.edition.set.prefix == prefix && isKickstarter(element.edition.slug) == fromKickstarter);
+        var entryIndex = tempObj.findIndex((element) => element.edition.set.prefix == prefix &&
+                                                        element.edition.rarity == rarity &&
+                                                        isKickstarter(element.edition.slug) == isKickstarter(editionSlug));
         //console.log(`Checking to see if the prefix ${prefix} exists within editionQuantities, received index = ${entryIndex}`);
         if (entryIndex != -1){
             var entry = tempObj[entryIndex];
             //not allowed to go below 0
-            console.log(`Entry quantity old: ${entry.quantity}`);
             entry.quantity = Math.max(0, entry.quantity + (adding ? 1 : -1));
             tempObj[entryIndex] = entry;
-            
-            console.log(`Before State:\n`);
-            for (var e of editionQuantities){
-                console.log(`EQ Entry: ${e.edition.set.name} - ${e.quantity}`);
-            }
-            for (var e of cachedEQ){
-                console.log(`CQ Entry: ${e.edition.set.name} - ${e.quantity}`);
-            }
-            for (var e of tempObj){
-                console.log(`Temp Entry: ${e.edition.set.name} - ${e.quantity}`);
-            }
-            console.log(`Entry quantity new: ${entry.quantity}`);
-
             setEditionQuantities(tempObj);
-            console.log(`After State:\n`);
-            for (var e of editionQuantities){
-                console.log(`EQ Entry: ${e.edition.set.name} - ${e.quantity}`);
-            }
-            for (var e of cachedEQ){
-                console.log(`CQ Entry: ${e.edition.set.name} - ${e.quantity}`);
-            }
         
         }
         else console.error(`Entry was null.`);
@@ -127,7 +109,7 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
 
         //compare the entries
         for (let index = 0; index < cachedArr.length; index++){
-            console.log(`Checking if element ${cachedArr[index].edition.set.name} has changed values... Cached = ${cachedArr[index].quantity}, Mod = ${moddedArr[index].quantity}`);
+            //console.log(`Checking if element ${cachedArr[index].edition.set.name} has changed values... Cached = ${cachedArr[index].quantity}, Mod = ${moddedArr[index].quantity}`);
             if (cachedArr[index].edition.set.prefix == moddedArr[index].edition.set.prefix && 
                 cachedArr[index].quantity != moddedArr[index].quantity) return true;
         }
@@ -147,21 +129,21 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
         <View style = { styles.flexibleBox }>
             <ScrollView horizontal = { true } scrollEnabled = { false }>
                 <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange } />
-                <Button
-                    color = "blue"
+                <CustomButton
                     title= "Update Collection"
-                    onPress={() => updateQuantities()}
+                    onPress={() => function(){ updateQuantities()} }
                     disabled = { updateDisabled }
                 />
             </ScrollView>
             <FlatList 
                 data = { editionQuantities }
                 extraData = { editionQuantities }
+                ItemSeparatorComponent= {() => (<View style = {{borderBottomColor: "white", borderBottomWidth: 1}}/>) }
                 renderItem ={({item}) => <GA_EditionEntry 
                                             edition = { item.edition } 
                                             quantity = { item.quantity != -1 ? `${item.quantity}` : "-" } 
-                                            subHandler= { function(){ handlePress(item.edition.set.prefix, false, isKickstarter(item.edition.slug)) }}
-                                            addHandler= { function(){ handlePress(item.edition.set.prefix, true, isKickstarter(item.edition.slug)) }}
+                                            subHandler= { function(){ handlePress(item.edition.set.prefix, item.edition.slug, item.edition.rarity, false) }}
+                                            addHandler= { function(){ handlePress(item.edition.set.prefix,item.edition.slug, item.edition.rarity, true) }}
                                             disabled = { currentCollection == null }
                                         />}
                 scrollEnabled = { false }

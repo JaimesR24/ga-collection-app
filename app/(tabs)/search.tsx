@@ -6,6 +6,7 @@ import GA_CardEntry from '@/components/GA_CardEntry';
 import * as CardDatabase from '@/scripts/Database';
 import { useLocalSearchParams } from "expo-router";
 import CollectionDropdown from "@/components/CollectionDropdown";
+import CustomButton from "@/components/CustomButton";
 
 export enum SearchMode {Index, Collection};
 
@@ -16,11 +17,12 @@ export default function Tab(){
     const [searchMode, setSearchMode] = useState(SearchMode.Index);
     const [currentCollection, setCollection] = useState(null as number | null);
     const [hasInitialized, setInitState] = useState(false);
+    const [resultInfo, setResultInfo] = useState({currentPage: 0, maxPage: 0, totalResults: 0});
 
     useLayoutEffect(() => {
         if (!hasInitialized && local){
-            console.log(`Id... ${JSON.stringify(local.c_id)}`);
-            console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
+            //console.log(`Id... ${JSON.stringify(local.c_id)}`);
+            //console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
             setCollection(Number(local.c_id as string) || null);
             setSearchMode(Number(local.mode as string) as SearchMode || SearchMode.Index);
             setInitState(true);
@@ -33,29 +35,22 @@ export default function Tab(){
 
     }, [searchMode, currentCollection]);
 
-    async function getAPICardlist(){
+    async function getAPICardlist(page_number: number = 1){
         var URL = '';
         if (typeof searchParameters == 'string') URL = GA_nameSearchURL(searchParameters);
         else URL = GA_advancedSearchURL(searchParameters);
 
-        var json;
-        var page_number = 1;
-        var final_data;
-        while (page_number == 1 || json?.has_more){
-            var newURL = URL + `&page=${page_number}`;
-            try {
-                console.log(`Search attempting to fetch with this url: ${newURL}`);
-                const response = await fetch(newURL);
-                json = await response.json();
-                final_data = page_number == 1 ? json.data : [...final_data || [], ...json.data];
-                page_number++;
-            }
-            catch(error){
-                console.error(`Invalid JSON Output: ${error}`);
-                break;
-            }
+        var newURL = URL + `&page=${page_number}`;
+        try {
+            console.log(`Search attempting to fetch with this url: ${newURL}`);
+            const response = await fetch(newURL);
+            const json = await response.json();
+            setResultInfo({currentPage: page_number, maxPage: json.total_pages, totalResults: json.total_cards});
+            setSearchResults(json.data);
         }
-        setSearchResults(final_data);
+        catch(error){
+            console.error(`Invalid JSON Output: ${error}`);
+        }
         //console.log(JSON.stringify(final_data));
     }
 
@@ -78,22 +73,19 @@ export default function Tab(){
 
     return (
         <View style = {styles.main}>
-            <ScrollView horizontal = { true } scrollEnabled = { false }>
-                <Text style = { styles.text }>Searching through...</Text>
-                <Button
-                    color = "white"
-                    title= "Collection"
-                    onPress={() => toggleSearchMode()}
+            <View style = {{maxHeight: 50, flexDirection: "row"}}>
+                <CustomButton
+                    title= "Collections"
+                    onPress={() => function(){ toggleSearchMode() }}
                     disabled = { searchMode == SearchMode.Collection }
                 />
-                <Button
-                    color = "white"
+                <CustomButton
                     title= "Index"
-                    onPress={() => toggleSearchMode()}
+                    onPress={() => function(){ toggleSearchMode() }}
                     disabled = { searchMode == SearchMode.Index }
                 />
 
-            </ScrollView>
+            </View>
             {searchMode == SearchMode.Collection ? <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange }/> : null }
             <TextInput 
                 style={styles.textInput} 
@@ -102,6 +94,25 @@ export default function Tab(){
                 defaultValue = "Search..." 
                 onSubmitEditing={() => searchMode == SearchMode.Index ? getAPICardlist() : getCollectionCardlist()}
             />
+            { resultInfo.maxPage != 0 && searchResults != null ? 
+                <View style = {{alignItems: "center"}}>
+                    <Text style = {styles.text}>{`Displaying ${1 + (resultInfo.currentPage - 1) * 50 + (resultInfo.currentPage != 1 ? searchResults.length : 0)}-${searchResults.length  + (resultInfo.currentPage - 1) * 50} of ${resultInfo.totalResults} cards`}</Text>
+                    <View style = {{flexDirection: "row"}}>
+                        <CustomButton
+                            title= "<"
+                            onPress={() => function(){ getAPICardlist(resultInfo.currentPage - 1) }}
+                            disabled = { resultInfo.currentPage == 1 }
+                        />
+                        <Text style = {styles.text}>{`Page ${resultInfo.currentPage} of ${resultInfo.maxPage}`}</Text>
+                        <CustomButton
+                            title= ">"
+                            onPress={() => function(){ getAPICardlist(resultInfo.currentPage + 1) }}
+                            disabled = { resultInfo.currentPage == resultInfo.maxPage }
+                        />
+                    </View>
+                </View>
+                : null
+            }
             <FlatList 
                 data = {searchResults}
                 extraData = {currentCollection}
@@ -112,5 +123,4 @@ export default function Tab(){
     );
 }
 //consider nulling the flatlist to a simple "No results." when searchResults is empty
-//replace Buttons with pressables since you can't really customize or style the button itself very easily.
-//perhaps make a custom button component that is really a pressable with a default styling
+//consider adding a onRefresh functionality to empty search results while waiting for a new api/database request and show a loading symbol

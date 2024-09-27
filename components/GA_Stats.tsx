@@ -5,7 +5,7 @@ import { capitalizeFirstLetter } from '@/scripts/Utils';
 
 export default function GA_StatBox({card}: {card: APICardData}){
     return (
-        <View style = { styles.flexibleBox }>
+        <View style = { styles.box }>
             {card.types && card.subtypes ? <Text style = {styles.text}>{getFullTypes(card)}</Text> : null}
             {card.element ? <Text style = {styles.text}>{`Element: ${capitalizeFirstLetter(card.element)}`}</Text> : null}
             {card.types ? <Text style = {styles.text}>{getCost(card)}</Text> : null}

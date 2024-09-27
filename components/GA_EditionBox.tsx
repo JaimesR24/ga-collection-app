@@ -1,4 +1,4 @@
-import { View, Text, Button, Pressable, FlatList, ScrollView } from 'react-native';
+import { View, Text, Button, Pressable, FlatList } from 'react-native';
 import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { styles } from '@/scripts/Styles';
 import { APICardData, APICardEdition, isKickstarter, Rarity } from '@/scripts/GA_Definitions';
@@ -126,15 +126,15 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
     }
 
     return (
-        <View style = { styles.flexibleBox }>
-            <ScrollView horizontal = { true } scrollEnabled = { false }>
+        <View style = { styles.box }>
+            <View style = {{flexDirection: "row"}}>
                 <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange } />
                 <CustomButton
                     title= "Update Collection"
                     onPress={() => function(){ updateQuantities()} }
                     disabled = { updateDisabled }
                 />
-            </ScrollView>
+            </View>
             <FlatList 
                 data = { editionQuantities }
                 extraData = { editionQuantities }

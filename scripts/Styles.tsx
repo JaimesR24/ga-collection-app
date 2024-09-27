@@ -33,16 +33,7 @@ export const styles = StyleSheet.create({
     box:{
         borderWidth: 1,
         borderColor: "white",
-        height: 40,
-        width: 400,
-        margin: 5,
-        padding: 10,
-        alignContent: "center",
-    },
-    flexibleBox:{
-        borderWidth: 1,
-        borderColor: "white",
-        width: 400,
+        display: "flex",
         margin: 5,
         padding: 10,
         alignContent: "center",
@@ -50,9 +41,9 @@ export const styles = StyleSheet.create({
     cardImage:{
         width: 250,
         height: 350,
-        alignItems: "center",
+        alignSelf: "center",
+        margin: 10,
         //this is exact margin within the parent view, flexibleBox. need to check on different resolutions
-        marginLeft: 75,
     },
     dropdown:{
         margin: 16,
@@ -61,12 +52,34 @@ export const styles = StyleSheet.create({
         borderBottomColor: "white",
         borderBottomWidth: 0.5,
     },
+    entry:{
+        borderWidth: 1,
+        borderColor: "white",
+        height: 40,
+        margin: 10,
+        padding: 5,
+        alignContent: "center",
+        justifyContent: "center",
+    },
     button:{
         borderColor: "white",
         borderWidth: 0.5,
-        minWidth: 20,
-        maxWidth: 50,
+        minWidth: 50,
+        minHeight: 30,
         margin: 10,
+        padding: 5,
+        alignContent: "center",
+        justifyContent: "center",
+    },
+    insideText:{
+        color: "white",
+        textAlign: "center",
+    },
+    quantityView:{
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },
 });
 

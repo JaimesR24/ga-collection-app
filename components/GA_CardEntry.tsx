@@ -10,8 +10,8 @@ export default function GA_CardEntry(card: any, c_id: number | null){
                     params: {ga_card: card.name, initCollection: c_id}
                     }} asChild>
             <Pressable>
-                <View style = {[styles.box, {backgroundColor: getElementColor(card.element)}]}>
-                    <Text style = {styles.text}>{card.name}</Text>
+                <View style = {[styles.entry, {backgroundColor: getElementColor(card.element)}]}>
+                    <Text style = {styles.insideText}>{card.name}</Text>
                 </View>
             </Pressable>
         </Link>

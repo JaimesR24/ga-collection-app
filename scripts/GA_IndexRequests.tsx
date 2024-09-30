@@ -1,10 +1,12 @@
 const ga_index_root = "https://api.gatcg.com";
 
+//API request URL for any cards using a certain passed string phrase
 export function GA_nameSearchURL(name: string){ return `${ga_index_root}/cards/search?name=${name}`; }
 
-//slug name doesn't seem to work
+//API request URL for a single card using its card slug. WARNING. does not seem to function properly for some reason.
 export function GA_nameSlugURL(name: string){ return `${ga_index_root}/cards/${name}`; }
 
+//API request URL to search for cards based on various paremeters. not currently used.
 export function GA_advancedSearchURL(params: any){
     //base URL for a card search with no assumptions
     var URL = `${ga_index_root}/cards/search?`;
@@ -25,33 +27,30 @@ export function GA_advancedSearchURL(params: any){
     return URL;
 }
 
+//helper function for the GA_advancedSearchURL request
 function isValidGAParam(input: string){
     const validParams = ["name", "effect", "element", "type", "subtype", "class", "prefix"];
     return validParams.includes(input.toLowerCase());
 }
 
-/*
-export function GA_cardImageURL(slug: string, prefix: string, isCSR: boolean){
-    return `https://ga-index-public.s3.us-west-2.amazonaws.com/cards/${slug}-${prefix}-${isCSR ? "CSR" : ""}.jpg`;
-}
-*/
-
+//return the source of a card's image based on the index's handling of images
 export function GA_cardImageURL(editionSlug: string){
     return `https://ga-index-public.s3.us-west-2.amazonaws.com/cards/${editionSlug}.jpg`;
 }
 
-
+//return the source of an element's icon from the index
 export function GA_elementIconURL(element: string){
     return `https://index.gatcg.com/images/icons/elements/${element}.png`;
 }
 
-//might have to change the input cause of multiple types, like regalia item specifically
+//return the source of a card type's icon from the index. not currently implemented.
 export function GA_typeIconURL(type: string){
     //item and item-regalia are two different things
-    //action, ally, champion, item, item-regalia, weapon
+    //action, ally, champion, item, item-regalia, weapon-regalia, weapon
     return `https://index.gatcg.com/images/icons/types/${type}.png`;
 }
 
+//return the source of the card cost icon from the index. dependent on regalia (blue) or memory (yellow) for the right icon
 export function GA_costIconURL(isMemory: false){
     return `https://index.gatcg.com/images/icons/${isMemory ? "memory" : "reserve"}_cost.png`;
 }

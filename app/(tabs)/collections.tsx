@@ -7,9 +7,9 @@ import CollectionEntry from "@/components/CollectionEntry";
 
 export default function Tab(){
     const [collectionEntries, setCollections] = useState([] as any[]);
-    const [cachedCollections, setCachedColl] = useState([] as any[]);
     const local = useLocalSearchParams();
 
+    //retrieve the current collections data from the database
     async function prepareCollectionView(){
         try{
             const result = await CardDatabase.getCollectionTotals();

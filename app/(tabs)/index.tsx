@@ -7,6 +7,7 @@ export default function Index() {
   const [databaseInitialized, setInitState] = useState(false);
   useEffect(() => {
 
+    //create the database if it doesn't exist.
     async function setup(){
       try {
         //await CardDatabase.clearDatabase();

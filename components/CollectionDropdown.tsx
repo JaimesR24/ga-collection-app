@@ -11,6 +11,8 @@ import { Dropdown } from 'react-native-element-dropdown';
     make sure the c_id in the value prop actually works as intended, feel like that's a potential bug
 */
 
+//a component intended to be used specifically for changing the current selected collection. the changeHandler is meant to be actually changing the c_id parameter via the parent component.
+//current used in the search and [ga_card] routes
 export default function CollectionDropdown({c_id, changeHandler}: {c_id: number | null, changeHandler: Function}){
     const [collectionData, setCollectionData] = useState([] as any[]);
 

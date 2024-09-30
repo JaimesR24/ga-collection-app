@@ -14,7 +14,6 @@ export default function GA_StatBox({card}: {card: APICardData}){
             {card.life ? <Text style = {styles.text}>{`Life: ${card.life}`}</Text> : null}
             {card.durability ? <Text style = {styles.text}>{`Durability: ${card.durability}`}</Text> : null}
             {card.speed ? <Text style = {styles.text}>{`Speed: ${card.speed}`}</Text> : null}
-            
             {card.effect_raw ? <Text style = {styles.text}>{`Effect:\n${card.effect_raw}`}</Text> : null}
             {card.flavor ? <Text style = {styles.text}>{`Flavor:\n${card.flavor}`}</Text> : null}
             

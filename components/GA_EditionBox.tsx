@@ -8,12 +8,18 @@ import CollectionDropdown from './CollectionDropdown';
 import CustomButton from './CustomButton';
 
 export default function GA_EditionBox({card, collection, imageHandler}: {card: APICardData, collection: number | null, imageHandler: Function}){
-    const [editionQuantities, setEditionQuantities] = useState(new Array<{edition: APICardEdition, quantity: number}>());
-    const [cachedEQ, setCachedEQ] = useState(new Array<{edition: APICardEdition, quantity: number}>());
-    const [currentCollection, setCollection] = useState(null as number | null);
-    const [updateDisabled, setUpdateDisabled] = useState(true);
+    //used to make sure a single rerender happens in one of the useEffect() functions
     const [hasInitialized, setInitState] = useState(false);
+    //hold all the edition information and quantity of cards in an array for the selected card. this one is updated as the user presses the + and - buttons
+    const [editionQuantities, setEditionQuantities] = useState(new Array<{edition: APICardEdition, quantity: number}>());
+    //holds the edition information and quantity of cards in an array. this one is a simple cached var, used to check against editionQuantities to see if the values have changed.
+    const [cachedEQ, setCachedEQ] = useState(new Array<{edition: APICardEdition, quantity: number}>());
+    //holds the current selected collection. this component is granted the initial state from the [ga_card] view, but maintained here since the main view doesn't need to.
+    const [currentCollection, setCollection] = useState(null as number | null);
+    //the state that maintains where the "Update Collection" button should be available.
+    const [updateDisabled, setUpdateDisabled] = useState(true);
 
+    //query the database for the initial values of the card per each edition, save the info.
     async function prepareBox(){
         try {
             if (!card.slug) {
@@ -46,6 +52,7 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
         catch(error) { console.log(error); }
     }
 
+    //the function that actually prepares the edition arrays. whenever currentCollection is updated, immediately call to query the database again based on the new collection.
     useEffect(() => {
         if (!hasInitialized){
             console.log(`Initializing collection... ${collection}`);
@@ -56,13 +63,16 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
             //only prepareBox after the initial call, otherwise it would call prepareBox() twice on startup
             prepareBox();
         }
+        //card.slug and card.editions are necessary for prepareBox() and may require a moment to properly pass the props
     }, [card.slug, card.editions, currentCollection]);
 
+    //anytime the edition quantities are changed, re-check the state of the "Update Collection" button
     useEffect(() => {
         //only call this when edition quantities is updated via handlePress(), and not via prepareBox()
         setUpdateDisabled(!hasChangedValues());
-    }, [editionQuantities]);
+    }, [editionQuantities, cachedEQ]);
 
+    //handler passed to the + and - buttons on the editions
     function handlePress(prefix:string, editionSlug: string, rarity: Rarity, adding: boolean){
         //console.log(adding ? "add" : "sub");
         var tempObj = JSON.parse(JSON.stringify(editionQuantities)) as Array<{edition: APICardEdition, quantity: number}>;
@@ -82,19 +92,17 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
         else console.error(`Entry was null.`);
     }
 
+    //handler for the dropdown changes
     function handleDropdownChange(new_id: number | null){
         setCollection(new_id);
     }
 
     //intended to be called to show an alert when switching collections informing the user that their previous changes will not be saved if they switch
     //"Are you sure you want to switch to _? Your previous changes will be lost."
+    //also used to verify whether the "Update Collection" button should be disabled or not
     function hasChangedValues(){
         //return if the values from the database query are the same as the current values in the state
-        if (!editionQuantities || !cachedEQ) return false;
-        if (editionQuantities.length != cachedEQ.length) {
-            console.error(`Cached quantites != modified quantities.`);
-            return false;
-        }
+        if ((!editionQuantities || !cachedEQ) || (editionQuantities.length != cachedEQ.length)) return false;
         //sort the arrays using their prefix. the elements should already be in order, but this ensures it
         var cachedArr = Array.from(cachedEQ.sort((a,b) => {
             if (a > b) return 1;
@@ -116,6 +124,7 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
         return false;
     }
 
+    //the handler for the "Update Collection" button which updates the new information into the database.
     async function updateQuantities(){
         if (!currentCollection) { console.error(`Error: No collection set when trying to modify cards!`); return; }
         for(var entry of editionQuantities){

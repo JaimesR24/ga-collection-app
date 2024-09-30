@@ -7,12 +7,12 @@ export default function CustomButton({title, onPress, disabled, buttonStyle = st
         <Pressable
             onPress= { onPress() }
             disabled = { disabled }
-            style = { [buttonStyle, {
-                backgroundColor: disabled ? "gray" : null
+            style = {({pressed}) => [buttonStyle, {
+                backgroundColor: disabled ? "gray" : pressed ? "red" : null,
             }]}
         >
             <Text style = {[textStyle, {
-                color: disabled ? "white" : "red",
+                color: "white"
             }]}>{title}</Text>
         </Pressable>
     );

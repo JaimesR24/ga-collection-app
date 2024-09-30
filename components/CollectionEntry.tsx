@@ -1,9 +1,9 @@
-//use a <Flatlist data = {}/> tag for the whole table
 import { View, Text, Button, Pressable, ScrollView } from 'react-native';
 import { styles } from '@/scripts/Styles';
 import { Link } from 'expo-router';
 import { SearchMode } from '@/app/(tabs)/search';
 
+//component used for individual collections in the collections view
 export default function CollectionEntry(c_id: number, name: string, quantity: number){
     return (
         <View style = {styles.entry}>

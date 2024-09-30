@@ -12,13 +12,20 @@ export enum SearchMode {Index, Collection};
 
 export default function Tab(){
     const local = useLocalSearchParams();
-    const [searchResults, setSearchResults] = useState([] as any[]);
-    const [searchParameters, setSearchParameters] = useState('');
-    const [searchMode, setSearchMode] = useState(SearchMode.Index);
-    const [currentCollection, setCollection] = useState(null as number | null);
+    //simple state to only render an effect once
     const [hasInitialized, setInitState] = useState(false);
-    const [resultInfo, setResultInfo] = useState({currentPage: 0, maxPage: 0, totalResults: 0});
+    //search mode to switch between index or database searches
+    const [searchMode, setSearchMode] = useState(SearchMode.Index);
+    //holding the current collection id, null gives you everything in all collections
+    const [currentCollection, setCollection] = useState(null as number | null);
+    //the field where the search parameters are
+    const [searchParameters, setSearchParameters] = useState('');
+    //the list of results from either the API index or the database
+    const [searchResults, setSearchResults] = useState([] as any[]);
+    //holds info related to the result that isn't directly used in rendering the result list.
+    const [resultInfo, setResultInfo] = useState({currentPage: 0, maxPage: 0, totalResults: 0, pageSize: 0});
 
+    //pass along the props via the local var into the states themselves
     useLayoutEffect(() => {
         if (!hasInitialized && local){
             //console.log(`Id... ${JSON.stringify(local.c_id)}`);
@@ -27,14 +34,14 @@ export default function Tab(){
             setSearchMode(Number(local.mode as string) as SearchMode || SearchMode.Index);
             setInitState(true);
         }
-
-        if (searchMode == SearchMode.Collection){
-            getCollectionCardlist();
-        }
+        //initialize the search results. if collection, get the total. if index, return nothing.
+        if (searchMode == SearchMode.Collection) getCollectionCardlist(); 
         else setSearchResults([]);
 
+        //rerender whenever the search mode or collection selection is changed to get the correct search results
     }, [searchMode, currentCollection]);
 
+    //make an API request from the Grand Archive Index to get the desired search results according to the searchParameters var
     async function getAPICardlist(page_number: number = 1){
         var URL = '';
         if (typeof searchParameters == 'string') URL = GA_nameSearchURL(searchParameters);
@@ -45,8 +52,8 @@ export default function Tab(){
             console.log(`Search attempting to fetch with this url: ${newURL}`);
             const response = await fetch(newURL);
             const json = await response.json();
-            setResultInfo({currentPage: page_number, maxPage: json.total_pages, totalResults: json.total_cards});
             setSearchResults(json.data);
+            setResultInfo({currentPage: page_number, maxPage: json.total_pages, totalResults: json.total_cards, pageSize: json.page_size});
         }
         catch(error){
             console.error(`Invalid JSON Output: ${error}`);
@@ -54,21 +61,25 @@ export default function Tab(){
         //console.log(JSON.stringify(final_data));
     }
 
-    async function getCollectionCardlist(){
-        //access the database
+    //make an database qyuery to get the desired search results according to the searchParameters var
+    async function getCollectionCardlist(page_number: number = 1){
         try{
-            const result = await CardDatabase.getUniqueCards(currentCollection, searchParameters);
-            setSearchResults(result);
+            const result = await CardDatabase.getUniqueCards(currentCollection, searchParameters, 50, 50 * (page_number - 1));
+            setSearchResults(result.result);
+            setResultInfo({currentPage: page_number, maxPage: result.info.total_pages, totalResults: result.info.card_count, pageSize: 50});
         }
         catch(error) { console.error(error); }
     }
     
+    //called when a new dropdown option is selected in the collection dropdown
     function handleDropdownChange(new_id: number | null){
         setCollection(new_id);
     }
 
+    //called when the buttons at the top of the Search view are pressed
     function toggleSearchMode(){
         setSearchMode(searchMode == SearchMode.Collection ? SearchMode.Index : SearchMode.Collection);
+        setSearchParameters('');
     }
 
     return (
@@ -94,31 +105,30 @@ export default function Tab(){
                 defaultValue = "Search..." 
                 onSubmitEditing={() => searchMode == SearchMode.Index ? getAPICardlist() : getCollectionCardlist()}
             />
-            { resultInfo.maxPage != 0 && searchResults != null ? 
+            { resultInfo.maxPage != 0 && searchResults.length > 0 ? 
                 <View style = {{alignItems: "center"}}>
-                    <Text style = {styles.text}>{`Displaying ${1 + (resultInfo.currentPage - 1) * 50 + (resultInfo.currentPage != 1 ? searchResults.length : 0)}-${searchResults.length  + (resultInfo.currentPage - 1) * 50} of ${resultInfo.totalResults} cards`}</Text>
+                    <Text style = {styles.text}>{`Displaying ${1 + (resultInfo.currentPage - 1) * resultInfo.pageSize}-${searchResults.length  + (resultInfo.currentPage - 1) * resultInfo.pageSize} of ${resultInfo.totalResults} cards`}</Text>
                     <View style = {{flexDirection: "row"}}>
                         <CustomButton
                             title= "<"
-                            onPress={() => function(){ getAPICardlist(resultInfo.currentPage - 1) }}
+                            onPress={() => function(){ searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage - 1) : getCollectionCardlist(resultInfo.currentPage - 1) }}
                             disabled = { resultInfo.currentPage == 1 }
                         />
-                        <Text style = {styles.text}>{`Page ${resultInfo.currentPage} of ${resultInfo.maxPage}`}</Text>
+                        <Text style = {styles.insideText}>{`Page ${resultInfo.currentPage} of ${resultInfo.maxPage}`}</Text>
                         <CustomButton
                             title= ">"
-                            onPress={() => function(){ getAPICardlist(resultInfo.currentPage + 1) }}
+                            onPress={() => function(){ searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage + 1) : getCollectionCardlist(resultInfo.currentPage + 1) }}
                             disabled = { resultInfo.currentPage == resultInfo.maxPage }
                         />
                     </View>
                 </View>
-                : null
+                : <Text style = { styles.text }>Nothing here yet. Search for a card!</Text>
             }
             <FlatList 
                 data = {searchResults}
                 extraData = {currentCollection}
                 renderItem ={({item}) => GA_CardEntry(item, searchMode == SearchMode.Collection ? currentCollection : null)}
             />
-
         </View>
     );
 }

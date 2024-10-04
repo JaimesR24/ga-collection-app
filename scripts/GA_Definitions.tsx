@@ -77,7 +77,7 @@ export type APICardData = {
     editions: APICardEdition[],
 }
 
-//NOT FUNCTIONAL. define the various parameters that could be used to query the Index for certain cards beyond just the name
+//NOT USED. define the various parameters that could be used to query the Index for certain cards beyond just the name
 export type APIParams = {
     page?: 1,
     page_size?: 50,

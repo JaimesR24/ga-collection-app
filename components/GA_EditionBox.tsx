@@ -6,6 +6,7 @@ import GA_EditionEntry from '@/components/GA_EditionEntry';
 import * as CardDatabase from '@/scripts/Database';
 import CollectionDropdown from './CollectionDropdown';
 import CustomButton from './CustomButton';
+import ConfirmModal from './ConfirmationModal';
 
 export default function GA_EditionBox({card, collection, imageHandler}: {card: APICardData, collection: number | null, imageHandler: Function}){
     //used to make sure a single rerender happens in one of the useEffect() functions
@@ -18,6 +19,8 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
     const [currentCollection, setCollection] = useState(null as number | null);
     //the state that maintains where the "Update Collection" button should be available.
     const [updateDisabled, setUpdateDisabled] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [cachedCollectionChange, setCollectionChange] = useState(null as number | null);
 
     //query the database for the initial values of the card per each edition, save the info.
     async function prepareBox(){
@@ -94,7 +97,19 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
 
     //handler for the dropdown changes
     function handleDropdownChange(new_id: number | null){
+        if (hasChangedValues() && new_id != currentCollection) { 
+            setCollectionChange(new_id);
+            setModalVisible(true);
+        }
+        else setCollection(new_id);
+    }
+
+    function updateDropdown(new_id: number | null){
         setCollection(new_id);
+    }
+
+    function revertDropdown(){
+        setCollectionChange(-1);//set to -1 since it's impossible to have as a collection id, signaling it's not used anymore.
     }
 
     //intended to be called to show an alert when switching collections informing the user that their previous changes will not be saved if they switch
@@ -136,8 +151,15 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
 
     return (
         <View style = { styles.box }>
+            <ConfirmModal
+                isVisible = { modalVisible }
+                headerMessage = { `Switch Collection?` } 
+                bodyMessage = { `Changing collections will discard your current changes.` } 
+                confirmHandler = { () => function(){ updateDropdown(cachedCollectionChange); setModalVisible(false); } }
+                cancelHandler = { () => function(){ revertDropdown(); setModalVisible(false); } }
+            />
             <View style = {{flexDirection: "row"}}>
-                <CollectionDropdown c_id = { currentCollection } changeHandler= { handleDropdownChange } />
+                <CollectionDropdown collection_id = { currentCollection } changeHandler= { handleDropdownChange } requestRefresh = { cachedCollectionChange == -1 } />
                 <CustomButton
                     title= "Update Collection"
                     onPress={() => function(){ updateQuantities()} }

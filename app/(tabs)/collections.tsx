@@ -4,9 +4,12 @@ import { styles } from '@/scripts/Styles';
 import * as CardDatabase from '@/scripts/Database';
 import { useLocalSearchParams } from "expo-router";
 import CollectionEntry from "@/components/CollectionEntry";
+import ConfirmModal from "@/components/ConfirmationModal";
 
 export default function Tab(){
     const [collectionEntries, setCollections] = useState([] as any[]);
+    const [confirmModalVisible, setConfirmModalVisible] = useState(false);
+    const [cachedCollection, setCachedCollection] = useState(-1 as number);
     const local = useLocalSearchParams();
 
     //retrieve the current collections data from the database
@@ -33,8 +36,24 @@ export default function Tab(){
         prepareCollectionView();
     }, []);
 
+    function handleDeletePrompt(c_id: number){
+        setCachedCollection(c_id);
+        setConfirmModalVisible(true);
+    }
+
+    function handleDeleteConfirm(c_id: number){
+
+    }
+
     return (
         <View style = {styles.main} >
+            <ConfirmModal
+                isVisible = { confirmModalVisible }
+                headerMessage = { `Delete Collection?` } 
+                bodyMessage = { `This will also delete any cards within this collection.` } 
+                confirmHandler = { () => function(){ handleDeleteConfirm(cachedCollection); setConfirmModalVisible(false); } }
+                cancelHandler = { () => function(){ setConfirmModalVisible(false); } }
+            />
             <FlatList 
                 data = {collectionEntries}
                 renderItem ={({item}) => CollectionEntry(item.c_id, item.name, item.total_cards)}

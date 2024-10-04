@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
         width: 350,
         margin: 14,
         color: "white",
-        fontSize: 24,
+        fontSize: 20,
         padding: 10,
     },
     box:{
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
     dropdown:{
         margin: 16,
         height: 30,
-        width: 150,
+        width: 200,
         borderBottomColor: "white",
         borderBottomWidth: 0.5,
     },
@@ -81,6 +81,32 @@ export const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+    },
+    modalView:{
+        alignItems: "center",
+        backgroundColor: "black",
+        borderColor: "white",
+        borderWidth: 0.5,
+        margin: 30,
+        borderRadius: 20,
+        padding: 20,
+        elevation: 5,
+    },
+    modalBackdrop:{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        height: '100%',
+        width: '100%',
+    },
+    modalHeader:{
+        color: "white",
+        fontSize: 32,
+    },
+    modalBody:{
+        color: "white",
+        fontSize: 16,
     },
 });
 

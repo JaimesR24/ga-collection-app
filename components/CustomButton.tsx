@@ -17,3 +17,8 @@ export default function CustomButton({title, onPress, disabled, buttonStyle = st
         </Pressable>
     );
 }
+/*
+            {({pressed}) => (
+                
+            )}
+*/

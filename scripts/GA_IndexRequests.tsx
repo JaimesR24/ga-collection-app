@@ -1,7 +1,22 @@
 const ga_index_root = "https://api.gatcg.com";
 
-//API request URL for any cards using a certain passed string phrase
-export function GA_nameSearchURL(name: string){ return `${ga_index_root}/cards/search?name=${name}`; }
+//API request for any cards using a certain passed string phrase and page number
+export async function get_GA_NameSearch(name: string, page_number: number | null = null){
+    var URL = `${ga_index_root}/cards/search?name=${name}`;
+    if (page_number) URL += `&page=${page_number}`;
+    try {
+        console.log(`Search attempting to fetch with this url: ${URL}`);
+        const response = await fetch(URL);
+        console.log(`Response: ${JSON.stringify(response)}`);
+        if (response == null) return null;
+        const json = await response.json();
+        return json;
+    }
+    catch(error){
+        console.error(`Invalid JSON Output: ${error}`);
+        return null;
+    }
+}
 
 //API request URL for a single card using its card slug. WARNING. does not seem to function properly for some reason.
 export function GA_nameSlugURL(name: string){ return `${ga_index_root}/cards/${name}`; }

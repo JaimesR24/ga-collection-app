@@ -7,10 +7,12 @@ import CustomButton from './CustomButton';
 export default function GA_EditionEntry({edition, quantity, subHandler, addHandler, disabled}: {edition: APICardEdition, quantity: string, subHandler: Function, addHandler: Function, disabled: boolean}){
     return (
         <View>
-            {edition && edition.set ? <Text style = {styles.text}>{`${edition.set.name + (isKickstarter(edition.slug) ? " (KS)" : "")}`}</Text> : null }
-            <Text/>
-            <Text style = {styles.text}>{`${getRarity(edition.rarity)}`}</Text>
-            <Text/>
+            <View>
+                {edition && edition.set ? <Text style = {styles.text}>{`${edition.set.name + (isKickstarter(edition.slug) ? " (KS)" : "")}`}</Text> : null }
+                <Text/>
+                <Text style = {styles.text}>{`${getRarity(edition.rarity)}`}</Text>
+                <Text/>
+            </View>
             <View style = { styles.quantityView }>
                 <CustomButton
                     title="-"

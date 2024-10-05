@@ -7,7 +7,7 @@ const db = SQLite.openDatabaseAsync('ga-collection.db');
 export async function setupDatabase(){
     await (await db).execAsync(`
         CREATE TABLE IF NOT EXISTS collections(
-            c_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            c_id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE
         );
         
@@ -36,23 +36,36 @@ export async function getEverything(){
 
 //called within settings to reset the database
 export async function clearDatabase(){
-    const query = `DROP TABLE IF EXISTS collections;
-                   DROP TABLE IF EXISTS ga_cards;`
-    await (await db).execAsync(query);
+    await (await db).execAsync(`DROP TABLE IF EXISTS collections;
+                                DROP TABLE IF EXISTS ga_cards;`);
     console.log("Database cleared.");
     return Promise<void>;
 }
 
-//NOT FUNCTIONAL. add a new entry to the "collections" table. MAKE SURE THAT DUPLICATES OR "TOTAL" DOESN'T EXIST!
+export async function resetDatabase(){
+    await clearDatabase();
+    await setupDatabase();
+    console.log("Full reset complete.");
+    return Promise<void>;
+}
+
+//add a new entry to the "collections" table. if an identical name is inside, it simply ignores the insert
 export async function addCollection(name: string){
     await (await db).runAsync(`INSERT OR IGNORE INTO collections (name) VALUES ("${name}")`);
     console.log(`Added collection ${name}`);
     return Promise<void>;
 }
 
+//simply change the name of a collection
+export async function editCollection(c_id: number, name: string){
+    await (await db).runAsync(`UPDATE collections SET name = "${name}" WHERE c_id = ${c_id}`);
+    //console.log();
+    return Promise<void>;
+}
+
 //delete an entry from the "collections" table
 export async function deleteCollection(c_id: number){
-    await (await db).runAsync(`DELETE FROM collections where c_id == ${c_id};`);
+    await (await db).runAsync(`DELETE FROM collections WHERE c_id ==${c_id};`);
     console.log(`Removed collection with id: ${c_id}`);
     return Promise<void>;
 }

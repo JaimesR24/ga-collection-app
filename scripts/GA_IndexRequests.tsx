@@ -7,8 +7,6 @@ export async function get_GA_NameSearch(name: string, page_number: number | null
     try {
         console.log(`Search attempting to fetch with this url: ${URL}`);
         const response = await fetch(URL);
-        console.log(`Response: ${JSON.stringify(response)}`);
-        if (response == null) return null;
         const json = await response.json();
         return json;
     }

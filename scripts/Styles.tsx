@@ -17,7 +17,8 @@ export const styles = StyleSheet.create({
         color: "white",
     },
     title:{
-        fontSize: 32
+        fontSize: 32,
+        textAlign: "center",
     },
     textInput:{
         borderWidth: 1,
@@ -57,6 +58,7 @@ export const styles = StyleSheet.create({
         borderColor: "white",
         height: 40,
         width: 350,
+        //width: "90%",
         margin: 10,
         padding: 5,
         alignContent: "center",
@@ -107,6 +109,35 @@ export const styles = StyleSheet.create({
     modalBody:{
         color: "white",
         fontSize: 16,
+    },
+    collectionsButton:{
+        borderColor: "white",
+        borderWidth: 0.5,
+        width: 30,
+        height: 30,
+        padding: 5,
+        justifyContent: "center",
+        alignContent: "center",
+    },
+    iconImage:{
+        width: 20,
+        height: 20,
+        alignSelf: "center",
+    },
+    buttonRowView:{
+        marginLeft: "auto",
+        alignContent: "center",
+        justifyContent: "flex-end",
+    },
+    modalInput:{
+        borderWidth: 1,
+        borderColor: "white",
+        backgroundColor: "grey",
+        height: 45,
+        width: 250,
+        color: "white",
+        fontSize: 20,
+        padding: 10,
     },
 });
 

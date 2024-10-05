@@ -155,22 +155,22 @@ export default function GA_EditionBox({card, collection, imageHandler}: {card: A
                 isVisible = { modalVisible }
                 headerMessage = { `Switch Collection?` } 
                 bodyMessage = { `Changing collections will discard your current changes.` } 
-                confirmHandler = { () => function(){ updateDropdown(cachedCollectionChange); setModalVisible(false); } }
-                cancelHandler = { () => function(){ revertDropdown(); setModalVisible(false); } }
+                confirmHandler = { () => { updateDropdown(cachedCollectionChange); setModalVisible(false); }}
+                cancelHandler = { () => { revertDropdown(); setModalVisible(false); }}
             />
             <View style = {{flexDirection: "row"}}>
                 <CollectionDropdown collection_id = { currentCollection } changeHandler= { handleDropdownChange } requestRefresh = { cachedCollectionChange == -1 } />
                 <CustomButton
-                    title= "Update Collection"
-                    onPress={() => function(){ updateQuantities()} }
+                    title = "Update Collection"
+                    onPress = { updateQuantities }
                     disabled = { updateDisabled }
                 />
             </View>
             <FlatList 
                 data = { editionQuantities }
                 extraData = { editionQuantities }
-                ItemSeparatorComponent= {() => (<View style = {{borderBottomColor: "white", borderBottomWidth: 1}}/>) }
-                renderItem ={({item}) => <GA_EditionEntry 
+                ItemSeparatorComponent = {() => (<View style = {{borderBottomColor: "white", borderBottomWidth: 1}}/>) }
+                renderItem = {({item}) => <GA_EditionEntry 
                                             edition = { item.edition } 
                                             quantity = { item.quantity != -1 ? `${item.quantity}` : "-" } 
                                             subHandler= { function(){ handlePress(item.edition.set.prefix, item.edition.slug, item.edition.rarity, false) }}

@@ -93,15 +93,14 @@ export default function Tab(){
             <View style = {{maxHeight: 50, flexDirection: "row"}}>
                 <CustomButton
                     title= "Collections"
-                    onPress={() => function(){ toggleSearchMode() }}
+                    onPress={ toggleSearchMode }
                     disabled = { searchMode == SearchMode.Collection }
                 />
                 <CustomButton
                     title= "Index"
-                    onPress={() => function(){ toggleSearchMode() }}
+                    onPress={ toggleSearchMode }
                     disabled = { searchMode == SearchMode.Index }
                 />
-
             </View>
             { searchMode == SearchMode.Collection ? <CollectionDropdown collection_id = { currentCollection } changeHandler= { handleDropdownChange }/> : null }
             <TextInput 
@@ -111,24 +110,24 @@ export default function Tab(){
                 defaultValue = "Search..." 
                 onSubmitEditing={() => searchMode == SearchMode.Index ? getAPICardlist() : getCollectionCardlist()}
             />
-            { resultInfo.maxPage != 0 && searchResults.length > 0 ? 
+            { searchResults.length > 0 ? 
                 <View style = {{alignItems: "center"}}>
                     <Text style = {styles.text}>{`Displaying ${1 + (resultInfo.currentPage - 1) * resultInfo.pageSize}-${searchResults.length  + (resultInfo.currentPage - 1) * resultInfo.pageSize} of ${resultInfo.totalResults} cards`}</Text>
                     <View style = {{flexDirection: "row"}}>
                         <CustomButton
                             title= "<"
-                            onPress={() => function(){ searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage - 1) : getCollectionCardlist(resultInfo.currentPage - 1) }}
+                            onPress={() => searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage - 1) : getCollectionCardlist(resultInfo.currentPage - 1) }
                             disabled = { resultInfo.currentPage == 1 }
                         />
                         <Text style = {styles.insideText}>{`Page ${resultInfo.currentPage} of ${resultInfo.maxPage}`}</Text>
                         <CustomButton
                             title= ">"
-                            onPress={() => function(){ searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage + 1) : getCollectionCardlist(resultInfo.currentPage + 1) }}
+                            onPress={() => searchMode == SearchMode.Index ? getAPICardlist(resultInfo.currentPage + 1) : getCollectionCardlist(resultInfo.currentPage + 1) }
                             disabled = { resultInfo.currentPage == resultInfo.maxPage }
                         />
                     </View>
                 </View>
-                : <Text style = { styles.text }>Nothing here yet. Search for a card!</Text>
+                : <Text style = { styles.text }>Nothing here yet. {searchMode == SearchMode.Index ? "\nSearch for a card!" : "\nAdd cards to your collection using the Index mode!"}</Text>
             }
             <FlatList 
                 data = {searchResults}

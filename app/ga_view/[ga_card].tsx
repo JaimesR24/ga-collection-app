@@ -8,7 +8,7 @@ import GA_StatBox from "@/components/GA_Stats";
 import GA_EditionBox from "@/components/GA_EditionBox";
 import Modal from "react-native-modal";
 
-//import genericCardBack from "@/assets/images/GA-cardback.png";
+const genericCardback = require("@/assets/images/GA-cardback.png");
 
 export default function CardView() {
     //passed props from the GA_CardEntry press
@@ -16,7 +16,7 @@ export default function CardView() {
     //the current full card information object from the API request
     const [currentCard, setCard] = useState({} as APICardData);
     //the card image link shown here. initialized to a blank card back.
-    const [currentImageSrc, setImageSrc] = useState("@/assets/images/GA-cardback.png");//doesn't seem to work
+    const [currentImageSrc, setImageSrc] = useState("");//doesn't seem to work
     //necessary to change the name of the tab
     const navigation = useNavigation();
     //visible state for the modal component used as a pop up
@@ -51,7 +51,7 @@ export default function CardView() {
         <View style={styles.main}>
             <ScrollView>
                 <Image
-                    source = {{ uri: currentImageSrc }}
+                    source = { currentImageSrc == "" ? genericCardback : { uri: currentImageSrc }}
                     style = {styles.cardImage}
                 />
                 { currentCard ? <GA_EditionBox card = { currentCard } collection = { Number(local.initCollection as string) } imageHandler= { handleChangeImage }/> : null}

@@ -16,13 +16,13 @@ export default function GA_EditionEntry({edition, quantity, subHandler, addHandl
             <View style = { styles.quantityView }>
                 <CustomButton
                     title="-"
-                    onPress={() => function(){ subHandler() }}
+                    onPress={ subHandler }
                     disabled = { disabled }
                 />
                 {edition && edition.set ? <Text style = { styles.insideText }>{`Quantity: ${quantity}`}</Text> : null }
                 <CustomButton
                     title="+"
-                    onPress={() => function(){ addHandler() }}
+                    onPress={ addHandler }
                     disabled = { disabled }
                 />
             </View>

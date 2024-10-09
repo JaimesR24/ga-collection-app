@@ -6,7 +6,6 @@ import { APICardData } from "@/scripts/GA_Definitions";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import GA_StatBox from "@/components/GA_Stats";
 import GA_EditionBox from "@/components/GA_EditionBox";
-import Modal from "react-native-modal";
 
 const genericCardback = require("@/assets/images/GA-cardback.png");
 
@@ -16,7 +15,7 @@ export default function CardView() {
     //the current full card information object from the API request
     const [currentCard, setCard] = useState({} as APICardData);
     //the card image link shown here. initialized to a blank card back.
-    const [currentImageSrc, setImageSrc] = useState("");//doesn't seem to work
+    const [currentImageSrc, setImageSrc] = useState("");
     //necessary to change the name of the tab
     const navigation = useNavigation();
     //visible state for the modal component used as a pop up

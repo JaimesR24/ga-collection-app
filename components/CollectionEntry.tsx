@@ -44,4 +44,3 @@ export default function CollectionEntry(c_id: number, name: string, quantity: nu
         </View>
     )
 }
-//add a button that can be used to delete a collection, or have a specific "Delete mode" where collections can be selected and deleted

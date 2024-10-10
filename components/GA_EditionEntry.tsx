@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 import { styles } from '@/scripts/Styles';
 import { APICardEdition, getRarity, isKickstarter } from '@/scripts/GA_Definitions';
-import CustomButton from './CustomButton';
+import CustomButton from '@/components/CustomButton';
 
 //called in GA_EditionBox component, the individual entry item and handlers for manipulating the quantities of a card.
 export default function GA_EditionEntry({edition, quantity, subHandler, addHandler, disabled}: {edition: APICardEdition, quantity: string, subHandler: Function, addHandler: Function, disabled: boolean}){

@@ -1,12 +1,12 @@
-import { View, Text, Button, Pressable, FlatList } from 'react-native';
-import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { View, FlatList } from 'react-native';
+import React, { useState, useEffect, } from 'react';
 import { styles } from '@/scripts/Styles';
 import { APICardData, APICardEdition, isKickstarter, Rarity } from '@/scripts/GA_Definitions';
 import GA_EditionEntry from '@/components/GA_EditionEntry';
 import * as CardDatabase from '@/scripts/Database';
-import CollectionDropdown from './CollectionDropdown';
-import CustomButton from './CustomButton';
-import ConfirmModal from './ConfirmationModal';
+import CollectionDropdown from '@/components/CollectionDropdown';
+import CustomButton from '@/components/CustomButton';
+import ConfirmModal from '@/components/ConfirmationModal';
 
 export default function GA_EditionBox({card, collection, imageHandler}: {card: APICardData, collection: number | null, imageHandler: Function}){
     //used to make sure a single rerender happens in one of the useEffect() functions

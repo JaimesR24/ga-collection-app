@@ -1,4 +1,4 @@
-import { Text, View, Pressable, Button, FlatList } from "react-native";
+import { View, FlatList } from "react-native";
 import React, { useState, useEffect } from 'react';
 import { styles } from '@/scripts/Styles';
 import * as CardDatabase from '@/scripts/Database';

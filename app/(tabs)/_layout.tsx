@@ -32,7 +32,6 @@ export default function TabLayout(){
                     //tabBarIcon: () => <Text style = {styles.temp}>Settings</Text>
                 }}
             />
-            
         </Tabs>
     );
 }

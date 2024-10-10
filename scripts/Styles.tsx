@@ -52,11 +52,17 @@ export const styles = StyleSheet.create({
         width: 200,
         borderBottomColor: "white",
         borderBottomWidth: 0.5,
+        backgroundColor: "black",
+    },
+    dropdownContainer:{
+        backgroundColor: "black",
+
     },
     entry:{
         borderWidth: 1,
         borderColor: "white",
-        height: 40,
+        minHeight: 40,
+        maxHeight: 60,
         width: 350,
         //width: "90%",
         margin: 10,

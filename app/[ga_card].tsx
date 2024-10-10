@@ -1,4 +1,4 @@
-import { Text, View, Button, Image, ScrollView,} from "react-native";
+import { View, Image, ScrollView, Text } from 'react-native';
 import React, { useState, useLayoutEffect } from 'react';
 import { styles } from '@/scripts/Styles';
 import * as GA_API from "@/scripts/GA_IndexRequests";
@@ -20,7 +20,7 @@ export default function CardView() {
     const navigation = useNavigation();
     //visible state for the modal component used as a pop up
 
-    //get the information from the Grand Archive Index tto display here. does not matter whether the initial call came from Collection or Index search.
+    //get the information from the Grand Archive Index to display here. does not matter whether the initial call came from Collection or Index search.
     async function prepareCardView(name: string){ 
         try {
             //console.log(`First Stringify: ${JSON.stringify(currentCard)}`);

@@ -5,7 +5,7 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{title: "", headerShown: false}}/>
-      <Stack.Screen name="ga_view/[ga_card]" options = { headerOptions }/>
+      <Stack.Screen name="[ga_card]" options = { headerOptions }/>
     </Stack>
   );
 }

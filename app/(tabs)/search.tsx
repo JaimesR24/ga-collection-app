@@ -1,4 +1,4 @@
-import { Text, TextInput, View, FlatList, StyleSheet, Button, ScrollView } from "react-native";
+import { Text, TextInput, View, FlatList, } from "react-native";
 import React, { useLayoutEffect, useState } from 'react';
 import { styles } from '@/scripts/Styles';
 import * as GA_API from "@/scripts/GA_IndexRequests";
@@ -13,8 +13,6 @@ export enum SearchMode {Index, Collection};
 
 export default function Tab(){
     const local = useLocalSearchParams();
-    //simple state to only render an effect once
-    const [hasInitialized, setInitState] = useState(false);
     //search mode to switch between index or database searches
     const [searchMode, setSearchMode] = useState(SearchMode.Index);
     //holding the current collection id, null gives you everything in all collections

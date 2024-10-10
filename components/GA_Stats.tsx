@@ -1,6 +1,6 @@
-import { View, Text, Button, Pressable } from 'react-native';
+import { View, Text, } from 'react-native';
 import { styles } from '@/scripts/Styles';
-import { APICardData, isMaterialCard, getFullTypes, getCost } from '@/scripts/GA_Definitions';
+import { APICardData, getFullTypes, getCost } from '@/scripts/GA_Definitions';
 import { capitalizeFirstLetter } from '@/scripts/Utils';
 
 export default function GA_StatBox({card}: {card: APICardData}){
@@ -14,11 +14,8 @@ export default function GA_StatBox({card}: {card: APICardData}){
             {card.life ? <Text style = {styles.text}>{`Life: ${card.life}`}</Text> : null}
             {card.durability ? <Text style = {styles.text}>{`Durability: ${card.durability}`}</Text> : null}
             {card.speed ? <Text style = {styles.text}>{`Speed: ${card.speed}`}</Text> : null}
-            {card.effect_raw ? <Text style = {styles.text}>{`Effect:\n${card.effect_raw}`}</Text> : null}
+            {card.effect ? <Text style = {styles.text}>{`Effect:\n${card.effect}`}</Text> : null}
             {card.flavor ? <Text style = {styles.text}>{`Flavor:\n${card.flavor}`}</Text> : null}
-            
         </View>
     )
 }
-
-//{card.legality ? <Text style = {styles.text}>{`Effect: ${card.legality}`}</Text> : null}

@@ -59,7 +59,6 @@ export default function Tab(){
         try {
             //typeof searchParameters == 'string' ? await GA_API.get_GA_NameSearch(searchParameters, page_number) : await GA_API.get_GA_AdvancedSearch();
             const result = await GA_API.get_GA_NameSearch(searchParameters, page_number);
-            //for (let i = 0; i < result.data.length; i++) result.data[i].quantity = null;
             setSearchResults(result.data);
             setResultInfo({currentPage: page_number, maxPage: result.total_pages, totalResults: result.total_cards, pageSize: result.page_size});
             

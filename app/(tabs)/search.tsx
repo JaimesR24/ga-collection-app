@@ -23,10 +23,12 @@ export default function Tab(){
     const [searchResults, setSearchResults] = useState([] as any[]);
     //holds info related to the result that isn't directly used in rendering the result list.
     const [resultInfo, setResultInfo] = useState({currentPage: 0, maxPage: 0, totalResults: 0, pageSize: 0});
+    //variable to check when this view is focused.
     const isFocused = useIsFocused();
 
     //pass along the props via the local var into the states themselves
     useLayoutEffect(() => {
+        //console.log(`Current Collection value: ${currentCollection}`);
         //initialize the search results. if collection, get the total. if index, return nothing.
         if (searchMode == SearchMode.Collection) getCollectionCardlist(); 
         else setSearchResults([]);
@@ -35,23 +37,47 @@ export default function Tab(){
     }, [searchMode, currentCollection]);
 
     useLayoutEffect(() => {
-        var c_id = Number(local.c_id as string) || null;
-        var mode = Number(local.mode as string) as SearchMode || SearchMode.Index;
-        if (c_id != currentCollection){
-            console.log(`Id... ${JSON.stringify(local.c_id)}`);
-            console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
-            setCollection(c_id);
-            setSearchMode(mode);
+        if (isFocused){
+            var c_id = Number(local.c_id as string) || null;
+            var mode = Number(local.mode as string) as SearchMode || SearchMode.Index;
+            //whenever you enter the search view, check the passed c_id variable to the current collection
+            //if the passed variable is not the same as the current collection, then you set it to the c_id variable
+            if (c_id != currentCollection && local.mode){
+                //console.log(`Id... ${JSON.stringify(local.c_id)}`);
+                //console.log(`Search Mode... ${JSON.stringify(local.mode)}`);
+                setSearchMode(mode);
+                setCollection(c_id);
+            }
+            else if (searchMode == SearchMode.Collection) checkValidCollection(); 
         }
-        else if (searchMode == SearchMode.Collection) verifyCollectionChanges();
     }, [isFocused]);
 
-    async function verifyCollectionChanges(){
-        try{
-            const numResult = await CardDatabase.getCollectionCount() as any;
-            if (numResult.sum != searchResults.length) getCollectionCardlist();
+    //function to see if the current collection id is still within the collections table in the database
+    async function checkValidCollection(){
+        //if current collection is null, there's no need to check and you can simply refresh the card list
+        //else, query the database for that id. if it is no longer valid, default the collection id to null
+        //if the collection indeed exists, then you can freely refresh the card list
+        /*KNOWN BUG with reused keys. 
+            replication: 
+                create collection entry
+                go to search view and select the new collection entry via collections mode
+                go to collection view and delete the collection
+                create a new collection immediately
+                move to search
+            expected result: since the collection was deleted, currentCollection should be set to null
+            actual result: despite the collections being different, the key they hold is the same since keys are reused and therefore currentCollection is the same
+        */
+        var shouldRefresh = false;
+        if (currentCollection) {
+            try {
+                const result = await CardDatabase.getCollection(currentCollection);
+                if (!result) setCollection(null);
+                else shouldRefresh = true;
+            }
+            catch (error) { console.error(error); }
         }
-        catch (error) { console.error(error); }
+        else shouldRefresh = true;
+        if (shouldRefresh) getCollectionCardlist();
     }
 
     //make an API request from the Grand Archive Index to get the desired search results according to the searchParameters var
@@ -61,7 +87,6 @@ export default function Tab(){
             const result = await GA_API.get_GA_NameSearch(searchParameters, page_number);
             setSearchResults(result.data);
             setResultInfo({currentPage: page_number, maxPage: result.total_pages, totalResults: result.total_cards, pageSize: result.page_size});
-            
         }
         catch(error){ 
             setSearchResults([]);
@@ -85,6 +110,7 @@ export default function Tab(){
     
     //called when a new dropdown option is selected in the collection dropdown
     function handleDropdownChange(new_id: number | null){
+        console.log(`Dropdown change... ${new_id}`);
         setCollection(new_id);
     }
 
@@ -109,7 +135,7 @@ export default function Tab(){
                     disabled = { searchMode == SearchMode.Index }
                 />
             </View>
-            { searchMode == SearchMode.Collection ? <CollectionDropdown collection_id = { currentCollection } changeHandler= { handleDropdownChange }/> : null }
+            { searchMode == SearchMode.Collection ? <CollectionDropdown collection_id = { currentCollection } changeHandler= { handleDropdownChange } requestRefresh = { isFocused }/> : null }
             <TextInput 
                 style={styles.textInput} 
                 onChangeText={setSearchParameters} 

@@ -71,20 +71,26 @@ export async function deleteCollection(c_id: number){
     return Promise<void>;
 }
 
+export async function getCollection(c_id: number){
+    const result = await (await db).getFirstAsync(`SELECT * FROM collections WHERE c_id = ${c_id}`);
+    return result;
+}
+
 //retrieve only the collections entries
 export async function getCollections(includeTotal: boolean = false){
     const result = await (await db).getAllAsync(`SELECT * FROM collections;`);
-    console.log(`Returning collections...`);
+    //console.log(`Returning collections...`);
     return includeTotal ? [{c_id: null, name: "Total"}, ...result] : result;
 }
 
 //retrieve the collections entries as well as the total quantity of cards within each collection. making sure to return 0 instead of null if there are no card entries
 export async function getCollectionTotals(){
     const result = await (await db).getAllAsync(`SELECT c_id, name, IFNULL(SUM(quantity), 0) as total_cards FROM collections LEFT JOIN ga_cards ON c_id == collection_id GROUP BY c_id;`);
-    console.log(`Returning collection totals...`);
+    //console.log(`Returning collection totals...`);
     return result;
 }
 
+//get the number of collections in the database
 export async function getCollectionCount(){
     const result = await (await db).getFirstAsync(`SELECT COUNT(c_id) as sum FROM collections;`);
     return result;

@@ -26,6 +26,10 @@ export default function TabLayout(){
                     title: "Search",
                     headerTitleAlign: "center",
                     //tabBarIcon: () => <Text style = {styles.temp}>Search</Text>
+                    href: {
+                        pathname: `/search`,
+                        params: {c_id: null, mode: null}
+                    }
                 }}
             />
             <Tabs.Screen

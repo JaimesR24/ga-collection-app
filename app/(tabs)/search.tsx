@@ -43,13 +43,23 @@ export default function Tab(){
             setCollection(c_id);
             setSearchMode(mode);
         }
+        else if (searchMode == SearchMode.Collection) verifyCollectionChanges();
     }, [isFocused]);
+
+    async function verifyCollectionChanges(){
+        try{
+            const numResult = await CardDatabase.getCollectionCount() as any;
+            if (numResult.sum != searchResults.length) getCollectionCardlist();
+        }
+        catch (error) { console.error(error); }
+    }
 
     //make an API request from the Grand Archive Index to get the desired search results according to the searchParameters var
     async function getAPICardlist(page_number: number = 1){
         try {
             //typeof searchParameters == 'string' ? await GA_API.get_GA_NameSearch(searchParameters, page_number) : await GA_API.get_GA_AdvancedSearch();
             const result = await GA_API.get_GA_NameSearch(searchParameters, page_number);
+            //for (let i = 0; i < result.data.length; i++) result.data[i].quantity = null;
             setSearchResults(result.data);
             setResultInfo({currentPage: page_number, maxPage: result.total_pages, totalResults: result.total_cards, pageSize: result.page_size});
             
@@ -61,7 +71,7 @@ export default function Tab(){
         //console.log(JSON.stringify(final_data));
     }
 
-    //make an database qyuery to get the desired search results according to the searchParameters var
+    //make a database query to get the desired search results according to the searchParameters var
     async function getCollectionCardlist(page_number: number = 1){
         try{
             const result = await CardDatabase.getUniqueCards(currentCollection, searchParameters, 50, 50 * (page_number - 1));

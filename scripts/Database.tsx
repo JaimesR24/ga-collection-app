@@ -6,6 +6,7 @@ const db = SQLite.openDatabaseAsync('ga-collection.db');
 //called on start up everytime.
 export async function setupDatabase(){
     await (await db).execAsync(`
+        PRAGMA foreign_keys = ON;
         CREATE TABLE IF NOT EXISTS collections(
             c_id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE
@@ -81,6 +82,11 @@ export async function getCollections(includeTotal: boolean = false){
 export async function getCollectionTotals(){
     const result = await (await db).getAllAsync(`SELECT c_id, name, IFNULL(SUM(quantity), 0) as total_cards FROM collections LEFT JOIN ga_cards ON c_id == collection_id GROUP BY c_id;`);
     console.log(`Returning collection totals...`);
+    return result;
+}
+
+export async function getCollectionCount(){
+    const result = await (await db).getFirstAsync(`SELECT COUNT(c_id) as sum FROM collections;`);
     return result;
 }
 

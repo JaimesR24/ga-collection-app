@@ -12,15 +12,14 @@ const editIcon = require("@/assets/images/edit.png");
 export default function CollectionEntry(c_id: number, name: string, quantity: number, editHandler: Function, deleteHandler: Function){
     
     return (
-        <View style = {[styles.entry, {flexDirection: "row"}]}>
+        <View style = {[styles.entry, {flexDirection: "row", padding: 5}]}>
             <Link href = {{
                     pathname: `../(tabs)/search`,
                     params: {c_id: c_id, mode: SearchMode.Collection}
                     }} asChild>
                 <Pressable>
-                    <View>
-                        <Text style = {styles.insideText}>{`${name}`}</Text>
-                        <Text style = {styles.insideText}>{`${quantity} cards`}</Text>
+                    <View style = { styles.collectionEntrySection }>
+                        <Text style = {styles.collectionEntryText}>{`${name}\n${quantity} card${ quantity == 1 ? "" : "s"}`}</Text>
                     </View>
                 </Pressable>
             </Link>
@@ -30,7 +29,7 @@ export default function CollectionEntry(c_id: number, name: string, quantity: nu
                     onPress = { editHandler }
                     disabled = { false }
                     imageSrc = { c_id ? editIcon : addIcon }
-                    buttonStyle = { [styles.collectionsButton, {marginRight: 5}] }
+                    buttonStyle = { styles.collectionsButton }
                 />
                 { c_id ? 
                 <CustomButton

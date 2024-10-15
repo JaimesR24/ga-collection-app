@@ -11,10 +11,31 @@ export default function GA_CardEntry(card: any, c_id: number | null){
                     params: {ga_card: card.name, initCollection: c_id}
                     }} asChild>
             <Pressable>
-                <View style = {[styles.entry, {backgroundColor: getElementColor(card.element)}]}>
+                <View style = {[styles.entry, {backgroundColor: getElementColor(card.element), flexDirection: "row", paddingTop: 8}]}>
                     <Text style = {styles.insideText}>{card.name}</Text>
+                    { card.quantity ? 
+                        <Text style = {[styles.text, {position: "absolute", right: 5, top: 8}]}>x{card.quantity}</Text>
+                    : null }
                 </View>
             </Pressable>
         </Link>
     )
 }
+//{ card.quantity ? <View style = {{justifyContent: "flex-end"}}><Text style = {styles.text}>x{card.quantity}</Text></View> : null }
+//{ card.quantity ? <Text style = {[styles.text, {alignContent: "flex-end"}]}>x{card.quantity}</Text> : null }
+
+/*
+{ card.quantity ? <View style = {{justifyContent: "flex-end"}}><Text style = {styles.text}>x{card.quantity}</Text></View> : null }
+{ card.quantity ? <Text style = {[styles.text, {alignContent: "flex-end"}]}>x{card.quantity}</Text> : null }
+
+
+
+                    <View>
+                        <Text style = {[styles.insideText, {justifyContent: "center"}]}>{card.name}</Text>
+                    </View>
+                    { card.quantity ? 
+                        <View style = {{justifyContent: "flex-end"}}>
+                            <Text style = {[styles.text]}>x{card.quantity}</Text>
+                        </View>
+                    : null }
+*/

@@ -62,11 +62,9 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "white",
         minHeight: 40,
-        maxHeight: 60,
         width: 350,
         //width: "90%",
         margin: 10,
-        padding: 5,
         alignContent: "center",
         justifyContent: "center",
     },
@@ -116,6 +114,16 @@ export const styles = StyleSheet.create({
         color: "white",
         fontSize: 16,
     },
+    modalInput:{
+        borderWidth: 1,
+        borderColor: "white",
+        backgroundColor: "grey",
+        height: 45,
+        width: 250,
+        color: "white",
+        fontSize: 20,
+        padding: 10,
+    },
     collectionsButton:{
         borderColor: "white",
         borderWidth: 0.5,
@@ -130,24 +138,34 @@ export const styles = StyleSheet.create({
         height: 20,
         alignSelf: "center",
     },
+    collectionEntrySection:{
+        flex: 3,
+        //borderWidth: 0.5,
+        //borderColor: "red",
+        textAlign: "left",
+        paddingRight: 200,
+    },
+    collectionEntryText:{
+        color: "white",
+    },
     buttonRowView:{
         marginLeft: "auto",
-        alignContent: "center",
         justifyContent: "flex-end",
-    },
-    modalInput:{
-        borderWidth: 1,
-        borderColor: "white",
-        backgroundColor: "grey",
-        height: 45,
-        width: 250,
-        color: "white",
-        fontSize: 20,
-        padding: 10,
+        alignItems: "center",
+        //borderColor: "green",
+        //borderWidth: 0.5,
     },
 });
 
-export const headerOptions = {
-    headerStyle: styles.header,
-    headerTitleStyle: styles.text,
+export const screenOptions = {
+    defaultHeader: {
+        title: "",
+        headerShown: false
+    },
+    cardDrawer:{
+        headerStyle: styles.header,
+        headerTitleStyle: styles.text,
+        headerTintColor: "white",
+        headerTitleAlign: "center",
+    },
 }

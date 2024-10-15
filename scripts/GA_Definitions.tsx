@@ -153,31 +153,45 @@ export function getElementColor(element: string){
     }
 }
 
-//get a properly formatted string based on the card's subtypes.
-export function getSubtypes(subtypes: string[]){
+//format the class array
+function getClasses(classes: string[]){
     var firstIteration = true;
-    var classes = "";
-    var types = ""
+    var result = "";
 
-    for (var s of subtypes){
-        s = Utils.capitalizeFirstLetter(s);
-        if (isClass(s)){
-            if (!firstIteration) classes += `/`;
-            else firstIteration = false;
-            classes += `${s}`;
+    for (var entry of classes){
+        entry = Utils.capitalizeFirstLetter(entry);
+        if (isClass(entry)){
+            if (firstIteration) firstIteration = false;
+            else result += "/";
+            result += `${entry}`;
         }
-        else types += ` ${s}`;
+        else console.log(`Odd Warning: Input String ${entry} is not a Grand Archive class.`); 
     }
-    return classes + types;
+    return result;
 }
 
-//utilize the getSubtypes() method to get a full string showing all main types and subtypes in a single line.
-export function getFullTypes({types, subtypes}: {types: string[], subtypes: string[]}){
-    var output = "";
-    for(var t of types){
-        output += `${Utils.capitalizeFirstLetter(t)} `;
+//format the subtype array
+function getSubtypes(subtypes: string[]){
+    var firstIteration = true;
+    var result = "";
+
+    for (var entry of subtypes){
+        entry = Utils.capitalizeFirstLetter(entry);
+        if (!isClass(entry)){
+            if (firstIteration) firstIteration = false;
+            else result += " ";
+            result += `${entry}`;
+        }
     }
-    output += `- ${getSubtypes(subtypes)}`;
+    return result;
+}
+
+//utilize the getClasses() and getSubtypes() methods to get a full string showing all main types and subtypes in a single line.
+export function getFullTypes({types, classes, subtypes}: {types: string[], classes: string[], subtypes: string[]}){
+    var output = "";
+    for(var t of types) output += `${Utils.capitalizeFirstLetter(t)} `; 
+    output += `- ${getClasses(classes)}`;
+    output += ` ${getSubtypes(subtypes)}`;
     return output;
 }
 

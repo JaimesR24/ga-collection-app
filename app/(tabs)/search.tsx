@@ -99,7 +99,7 @@ export default function Tab(){
     async function getCollectionCardlist(page_number: number = 1){
         try{
             const result = await CardDatabase.getUniqueCards(currentCollection, searchParameters, 50, 50 * (page_number - 1));
-            setSearchResults(result.result);
+            setSearchResults(result.data);
             setResultInfo({currentPage: page_number, maxPage: result.info.total_pages, totalResults: result.info.card_count, pageSize: 50});
         }
         catch(error) { 

@@ -128,7 +128,7 @@ export async function getUniqueCards(c_id: number | null = null, strParam: strin
     //console.log(`Attempting to get the amount of pages... quantity: ${output2.card_count}, result: ${Math.ceil(output2.card_count/limit)}`);
     output2.page_size = limit;
     //console.log(`Result for c_id ${c_id} looking for ${strParam}: ${JSON.stringify(result)}`);
-    return {result: output1, info: output2};
+    return {data: output1, info: output2};
 }
 
 //retrive the amount of cards in all edition prints that it has. used in the GA_EditionBox component.
@@ -167,5 +167,34 @@ export async function modifyCards(c_id: number, card: APICardData, edition: APIC
 
     await (await db).runAsync(query);
     console.log(`Modified ${edition.slug} in collection_id ${c_id} to: ${newQuantity}`);
+    return Promise<void>;
+}
+
+export async function exportDatabase(){
+    var output1 = await (await db).getAllAsync(`SELECT * from collections`);
+    var output2 = await (await db).getAllAsync(`SELECT * from ga_cards`);
+    return JSON.stringify({collections: output1, ga_cards: output2});
+}
+
+//function to import a database 
+export async function importDatabase(dbString: string, merge: boolean = false){
+    if (merge){
+        //no implementation yet
+    }
+    else{
+        var multiQuery = "";
+        await resetDatabase();
+        var db_temp = JSON.parse(dbString);
+        for (var collection of db_temp.collections){
+            multiQuery += `INSERT OR IGNORE INTO collections (c_id, name) VALUES (${collection.c_id}, "${collection.name}");\n`;
+        }
+        for (var ga_card of db_temp.ga_cards){
+            multiQuery += `INSERT INTO ga_cards VALUES (${ga_card.collection_id}, "${ga_card.card_slug}", "${ga_card.card_name}", "${ga_card.element}", "${ga_card.edition_slug}", "${ga_card.set_prefix}", ${ga_card.rarity}, ${ga_card.quantity})
+            ON CONFLICT (collection_id, edition_slug, rarity)
+            DO UPDATE SET quantity = EXCLUDED.quantity;\n`;
+        }
+        console.log(`Executing big query...\n${multiQuery}`);
+        await (await db).execAsync(multiQuery);
+    }
     return Promise<void>;
 }

@@ -19,7 +19,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.renej_24.gacollectionapp",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +33,20 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "9cf3bfcf-d755-4c10-a70c-295efd983738"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9cf3bfcf-d755-4c10-a70c-295efd983738"
     }
   }
 }

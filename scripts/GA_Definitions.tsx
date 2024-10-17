@@ -1,6 +1,7 @@
 import * as Utils from '@/scripts/Utils';
 
-enum Rarity{
+//used by the Grand Archive Index to classify card rarity
+export enum Rarity{
     C = 1,
     U = 2,
     R = 3,
@@ -12,6 +13,7 @@ enum Rarity{
     CPR = 9,
 }
 
+//change the rarity enum value into a string
 export function getRarity(val: Rarity){
     //maybe output color?
     switch(val){
@@ -38,6 +40,7 @@ export function getRarity(val: Rarity){
     }
 }
 
+//define the API request output (NOT CURRENTLY USED)
 export type APIRequest = {
     page: number,
     total_cards: number,
@@ -46,9 +49,10 @@ export type APIRequest = {
     has_more: boolean,
     sort: string,
     order: string,
-    data: APICardData,
+    data: APICardData[],
 };
 
+//API request output, specifically for an individual card
 export type APICardData = {
     uuid: string,
     types: string[],
@@ -73,6 +77,7 @@ export type APICardData = {
     editions: APICardEdition[],
 }
 
+//NOT USED. define the various parameters that could be used to query the Index for certain cards beyond just the name
 export type APIParams = {
     page?: 1,
     page_size?: 50,
@@ -100,6 +105,7 @@ export type APIParams = {
     legality?: { legality_format?:{limit?: number}}
 }
 
+//define the edition object that the Index returns
 export type APICardEdition = {
     uuid: string,
     card_id: string,
@@ -114,6 +120,7 @@ export type APICardEdition = {
     set: {name: string, prefix: string, language: string}
 }
 
+//turn the element string from APICardData into a color
 export function getElementColor(element: string){
     //console.log(`Testing element: ${element}`);
     switch(element.toUpperCase()){
@@ -140,52 +147,74 @@ export function getElementColor(element: string){
         case "NEOS":
             return "#905827";
         case "EXIA":
+            return "#701715";
         default:
             return "black";
     }
 }
 
-export function getSubtypes(subtypes: string[]){
+//format the class array
+function getClasses(classes: string[]){
     var firstIteration = true;
-    var classes = "";
-    var types = ""
+    var result = "";
 
-    for (var s of subtypes){
-        s = Utils.capitalizeFirstLetter(s);
-        if (isClass(s)){
-            if (!firstIteration) classes += `/`;
-            else firstIteration = false;
-            classes += `${s}`;
+    for (var entry of classes){
+        entry = Utils.capitalizeFirstLetter(entry);
+        if (isClass(entry)){
+            if (firstIteration) firstIteration = false;
+            else result += "/";
+            result += `${entry}`;
         }
-        else types += ` ${s}`;
+        else console.log(`Odd Warning: Input String ${entry} is not a Grand Archive class.`); 
     }
-    return classes + types;
+    return result;
 }
 
-export function getFullTypes({types, subtypes}: {types: string[], subtypes: string[]}){
-    var output = "";
-    for(var t of types){
-        output += `${Utils.capitalizeFirstLetter(t)} `;
+//format the subtype array
+function getSubtypes(subtypes: string[]){
+    var firstIteration = true;
+    var result = "";
+
+    for (var entry of subtypes){
+        entry = Utils.capitalizeFirstLetter(entry);
+        if (!isClass(entry)){
+            if (firstIteration) firstIteration = false;
+            else result += " ";
+            result += `${entry}`;
+        }
     }
-    output += `- ${getSubtypes(subtypes)}`;
+    return result;
+}
+
+//utilize the getClasses() and getSubtypes() methods to get a full string showing all main types and subtypes in a single line.
+export function getFullTypes({types, classes, subtypes}: {types: string[], classes: string[], subtypes: string[]}){
+    var output = "";
+    for(var t of types) output += `${Utils.capitalizeFirstLetter(t)} `; 
+    output += `- ${getClasses(classes)}`;
+    output += ` ${getSubtypes(subtypes)}`;
     return output;
 }
 
+//check to see if the string passed is a valid Grand Archive class
 function isClass(input: string){
     const classes = ['WARRIOR', 'MAGE', 'ASSASSIN', 'TAMER', 'RANGER', 'CLERIC', 'GUARDIAN'];
     return classes.includes(input.toUpperCase());
 }
 
+//check if the card is in the material deck or not
 export function isMaterialCard(types: string[]){
     //console.log(`checking card types: ${JSON.stringify(types)}`);
     return types.includes("CHAMPION") || types.includes("REGALIA");
 }
 
+//check what type of card cost the card requires.
 export function getCost(card: APICardData){
     var { type, cost } = isMaterialCard(card.types) ? {type: "Memory", cost: card.cost_memory} : {type: "Reserve", cost: card.cost_reserve};
     return `${type} Cost: ${cost}`;
 }
 
+//small helper function to help distinguish between 2 editions with the exact same prefix, but based on Kickstarter.
+//makes those editions easy to see and distinguishable from the official release within the database and the GA_EditionBox
 export function isKickstarter(slug: string){
     return /.-ks$/.test(slug);
 }

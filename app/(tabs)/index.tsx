@@ -6,15 +6,10 @@ import * as CardDatabase from '@/scripts/Database';
 export default function Index() {
   const [databaseInitialized, setInitState] = useState(false);
   useEffect(() => {
-
+    //create the database if it doesn't exist.
     async function setup(){
       try {
-        //await CardDatabase.clearDatabase();
         await CardDatabase.setupDatabase(); //the only database call that is required
-        //await CardDatabase.addCollection("Dummy Collection 1");
-        //await CardDatabase.addCollection("Dummy Collection 2");
-
-        //eventually add dummy card data
         setInitState(true);
       }
       catch(error) {
@@ -24,7 +19,6 @@ export default function Index() {
 
     if (databaseInitialized) return;
     setup();
-    
   }, []);
 
   return (

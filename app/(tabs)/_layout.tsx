@@ -8,6 +8,7 @@ export default function TabLayout(){
                 name = "index"
                 options = {{
                     title: "Home",
+                    headerTitleAlign: "center",
                     //tabBarIcon: () => <Text style = {styles.temp}>Collections</Text>
                 }}
             />
@@ -15,6 +16,7 @@ export default function TabLayout(){
                 name = "collections"
                 options = {{
                     title: "Collections",
+                    headerTitleAlign: "center",
                     //tabBarIcon: () => <Text style = {styles.temp}>Collections</Text>
                 }}
             />
@@ -22,17 +24,22 @@ export default function TabLayout(){
                 name = "search"
                 options = {{
                     title: "Search",
+                    headerTitleAlign: "center",
                     //tabBarIcon: () => <Text style = {styles.temp}>Search</Text>
+                    href: {
+                        pathname: `/search`,
+                        params: {c_id: null, mode: null}
+                    }
                 }}
             />
             <Tabs.Screen
                 name = "settings"
                 options = {{
                     title: "Settings",
+                    headerTitleAlign: "center",
                     //tabBarIcon: () => <Text style = {styles.temp}>Settings</Text>
                 }}
             />
-            
         </Tabs>
     );
 }

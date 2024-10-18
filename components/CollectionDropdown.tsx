@@ -38,6 +38,7 @@ export default function CollectionDropdown({collection_id, changeHandler, reques
             selectedTextStyle = { styles.text }
             containerStyle = { styles.dropdownContainer }
             itemTextStyle = { styles.text }
+            inputSearchStyle = { styles.text }
             activeColor = "gray"
             data = { collectionData }
             maxHeight = {300}
